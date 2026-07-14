@@ -34,7 +34,7 @@ export const addAddress = async (req, res) => {
       state,
       pincode,
       phone,
-      isDefault: isDefault || user.addresses.length === 0, // first address auto-default
+      isDefault: isDefault || user.addresses.length === 0, 
     });
 
     await user.save();
@@ -52,8 +52,8 @@ export const addAddress = async (req, res) => {
   }
 };
 
-/**
- * Update an existing address
+/*
+ Update an existing address
  */
 export const updateAddress = async (req, res) => {
   try {
@@ -105,8 +105,8 @@ export const updateAddress = async (req, res) => {
   }
 };
 
-/**
- * Delete an address
+/*
+ Delete an address
  */
 export const deleteAddress = async (req, res) => {
   try {
@@ -132,7 +132,6 @@ export const deleteAddress = async (req, res) => {
     const wasDefault = address.isDefault;
     address.deleteOne();
 
-    // if we deleted the default address, make the first remaining one default
     if (wasDefault && user.addresses.length > 0) {
       user.addresses[0].isDefault = true;
     }
@@ -152,8 +151,8 @@ export const deleteAddress = async (req, res) => {
   }
 };
 
-/**
- * Get all addresses for the logged-in customer
+/*
+ Get all addresses for the logged-in customer
  */
 export const getAddresses = async (req, res) => {
   try {
@@ -179,8 +178,8 @@ export const getAddresses = async (req, res) => {
   }
 };
 
-/**
- * Add / update the alternate phone number on the account
+/*
+Add / update the alternate phone number on the account
  */
 export const updateAltPhone = async (req, res) => {
   try {

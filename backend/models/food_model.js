@@ -18,6 +18,8 @@ const foodSchema = new mongoose.Schema(
       required: true,
     },
     isAvailable: { type: Boolean, default: true },
+    rating: { type: Number, default: 0 },       // ← new: average rating
+    numRatings: { type: Number, default: 0 }, 
   },
   { timestamps: true }
 );

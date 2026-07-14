@@ -152,9 +152,6 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    /* A brand-new order must go through accept/reject first, not the
-       generic status route, so a restaurant can't skip straight to
-       "preparing" on an order it hasn't accepted yet. */
     if (order.status === "placed" && !["confirmed", "cancelled"].includes(status)) {
       return res.status(400).json({
         success: false,

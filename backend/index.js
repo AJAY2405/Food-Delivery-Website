@@ -7,11 +7,16 @@ import cartRoute from "./routes/cartRoutes.js";
 import restaurantRoute from "./routes/restaurantRoutes.js";
 import paymentRoutes from "./routes/payment_routes.js";
 import orderRouter from "./routes/order_routes.js";
+import ratingRoute from "./routes/rating_route.js"
+import { backfillFoodRatings } from "./scripts/backfillFoodRatings.js";
+
 
 
 const app = express();
 
 connectDB();
+
+backfillFoodRatings();
 
 app.use(express.json()); 
 
@@ -31,6 +36,8 @@ app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/restaurant", restaurantRoute);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/order", orderRouter);
+app.use("/api/v1/rating", ratingRoute);
+
 
 
 

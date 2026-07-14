@@ -110,7 +110,7 @@ export const addToCart = async (req, res) => {
       cart.restaurant.toString() !== food.restaurant.toString() &&
       cart.items.length > 0
     ) {
-      // cart has items from a different restaurant
+
       if (!replaceCart) {
         return res.status(409).json({
           success: false,
@@ -119,13 +119,12 @@ export const addToCart = async (req, res) => {
           conflict: true,
         });
       }
-      // replace cart with the new restaurant's item
+      
       cart.restaurant = food.restaurant;
       cart.items = [
         { food: food._id, quantity: qty, priceAtAdd: food.price },
       ];
     } else {
-      // same restaurant (or empty cart) - merge quantity if item exists
       const existingItem = cart.items.find(
         (item) => item.food.toString() === food._id.toString()
       );
@@ -233,7 +232,6 @@ export const removeCartItem = async (req, res) => {
 
     item.deleteOne();
 
-    // if cart is now empty, clear the restaurant lock too
     if (cart.items.length === 0) {
       cart.restaurant = null;
     }
