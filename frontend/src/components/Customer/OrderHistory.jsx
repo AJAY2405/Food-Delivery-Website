@@ -15,7 +15,9 @@ import {
   ChevronUp,
   ArrowLeft,
   ThumbsDown,
+  Star,
 } from "lucide-react";
+import RatingModal from "./RatingModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -170,10 +172,26 @@ const StatusStepper = ({ status }) => {
 /* ── Single order card ── */
 const OrderCard = ({ order, onCancel, cancelling }) => {
   const [expanded, setExpanded] = useState(false);
+  const [ratings, setRatings] = useState({});
+  const [ratingsLoaded, setRatingsLoaded] = useState(false);
+  const [ratingTarget, setRatingTarget] = useState(null);
+
   const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.placed;
   const canCancel = CANCELLABLE_STATUSES.includes(order.status);
   const total = order.total ?? order.totalAmount ?? 0;
   const isRejected = order.status === "cancelled" && order.cancelledBy === "restaurant";
+
+  useEffect(() => {
+    if (expanded && order.status === "delivered" && !ratingsLoaded) {
+      axios
+        .get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/rating/order/${order._id}`, authHeaders())
+        .then((res) => {
+          if (res.data.success) setRatings(res.data.ratings || {});
+        })
+        .catch(() => {})
+        .finally(() => setRatingsLoaded(true));
+    }
+  }, [expanded, order.status, order._id, ratingsLoaded]);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -246,20 +264,43 @@ const OrderCard = ({ order, onCancel, cancelling }) => {
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
               Items
             </p>
-            {order.items.map((item, i) => (
-              <div
-                key={item._id ?? i}
-                className="flex items-center justify-between text-sm"
-              >
-                <span className="text-gray-700">
-                  <span className="font-medium">{item.quantity}×</span>{" "}
-                  {item.name || item.food?.name}
-                </span>
-                <span className="text-gray-500">
-                  {fmt((item.price ?? item.priceAtAdd ?? 0) * item.quantity)}
-                </span>
-              </div>
-            ))}
+            {order.items.map((item, i) => {
+              const foodId = item.food?._id || item.food;
+              const myRating = ratings[foodId];
+              return (
+                <div
+                  key={item._id ?? i}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-gray-700">
+                    <span className="font-medium">{item.quantity}×</span>{" "}
+                    {item.name || item.food?.name}
+                  </span>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-500">
+                      {fmt((item.price ?? item.priceAtAdd ?? 0) * item.quantity)}
+                    </span>
+
+                    {order.status === "delivered" && (
+                      <button
+                        onClick={() =>
+                          setRatingTarget({ _id: foodId, name: item.name || item.food?.name })
+                        }
+                        className="flex items-center gap-1 text-xs font-medium text-orange-600 hover:text-orange-700"
+                      >
+                        <Star
+                          className={`h-3.5 w-3.5 ${
+                            myRating ? "fill-orange-500" : ""
+                          }`}
+                        />
+                        {myRating ? myRating.rating.toFixed(1) : "Rate"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
 
             {/* Bill summary */}
             <div className="border-t border-dashed border-gray-200 pt-2 space-y-1">
@@ -323,6 +364,18 @@ const OrderCard = ({ order, onCancel, cancelling }) => {
           )}
         </div>
       )}
+
+      {/* ── Rating modal ── */}
+      <RatingModal
+        open={!!ratingTarget}
+        onClose={() => setRatingTarget(null)}
+        food={ratingTarget}
+        orderId={order._id}
+        existingRating={ratingTarget ? ratings[ratingTarget._id] : null}
+        onSubmitted={(foodId, data) =>
+          setRatings((prev) => ({ ...prev, [foodId]: data }))
+        }
+      />
     </div>
   );
 };

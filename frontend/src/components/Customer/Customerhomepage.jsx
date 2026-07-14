@@ -2,25 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, UtensilsCrossed } from "lucide-react";
 import AllFoods from "./AllFoods";
+import CustomerBrowse from "./CustomerBrowse";
 
 const CustomerHomepage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ── Initialise search from Navbar navigation state (if any) ──
   const [search] = useState(location.state?.search || "");
   const [heroLoaded, setHeroLoaded] = useState(false);
 
   const savedUser = JSON.parse(localStorage.getItem("user") || "null");
 
-  // ── Clear location state so a back-navigation doesn't re-apply the query ──
   useEffect(() => {
     if (location.state?.search) {
       window.history.replaceState({}, document.title);
     }
   }, []);
 
-  // ── Trigger the hero's entrance animation once mounted ──
   useEffect(() => {
     const t = setTimeout(() => setHeroLoaded(true), 60);
     return () => clearTimeout(t);
@@ -103,8 +101,8 @@ const CustomerHomepage = () => {
       </div>
 
       {/* Food section */}
-      <div className="mx-auto max-w-5xl px-4 py-10 scroll-mt-6">
-        {!search.trim() && <AllFoods />}
+      <div className="mx-auto max-w-5xl px-4 py-5 scroll-mt-6">
+        {!search.trim() && <CustomerBrowse />}
       </div>
     </div>
   );

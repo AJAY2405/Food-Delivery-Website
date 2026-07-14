@@ -96,8 +96,8 @@ const Navbar = () => {
   /* ── Role-based nav links ── */
   const getNavLinks = () => {
     const commonLinks = [
-      { to: "/", label: "Home", icon: <Home className="h-4 w-4" /> },
-      { to: "/about", label: "About", icon: <Info className="h-4 w-4" /> },
+      // { to: "/", label: "Home", icon: <Home className="h-4 w-4" /> },
+      // { to: "/about", label: "About", icon: <Info className="h-4 w-4" /> },
     ];
 
     if (!user) return commonLinks;
@@ -155,7 +155,7 @@ const Navbar = () => {
             icon: <UtensilsCrossed className="mr-2 h-4 w-4" />,
           },
           {
-            to: "/restaurant/addfood",
+            to: "/restaurant/add-food",
             label: "Add Food",
             icon: <UtensilsCrossed className="mr-2 h-4 w-4" />,
           },
@@ -301,7 +301,7 @@ const Navbar = () => {
           <div className="md:hidden border-t border-gray-200 dark:border-orange-900 bg-white/95 dark:bg-black/95 backdrop-blur-xl px-4 py-4 space-y-3">
 
             {/* Nav links */}
-            <div className="space-y-1">
+            {/* <div className="space-y-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -312,7 +312,7 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-            </div>
+            </div> */}
 
             <div className="pt-3 border-t border-gray-100 dark:border-orange-900/40">
               {user ? (

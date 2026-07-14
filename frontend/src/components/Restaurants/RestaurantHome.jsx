@@ -68,6 +68,7 @@ const RestaurantHome = () => {
         }
       } catch {
         /* silent – badge is non-critical */
+        console.log("")
       }
     };
 

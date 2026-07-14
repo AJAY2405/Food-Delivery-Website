@@ -29,6 +29,7 @@ import {
   PackageCheck,
   CircleDot,
   MapPin,
+  Navigation,
   Phone,
   Check,
   X,
@@ -122,6 +123,17 @@ const startOfMonth = () => {
   return d;
 };
 
+/* ── Open Google Maps directions from the visitor's current location to
+   a given delivery address. Leaving "origin" out of the URL lets Google
+   Maps default to "My Location" (it will prompt for location permission
+   if it hasn't been granted yet). ── */
+const openDirections = (address) => {
+  if (!address) return;
+  const destination = encodeURIComponent(address);
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+
 /* ── Revenue stat card ── */
 const StatCard = ({ label, value, sub, icon, accent }) => (
   <div className="rounded-2xl bg-white border border-gray-200 p-5 shadow-sm flex flex-col gap-2">
@@ -158,6 +170,11 @@ const OrderCard = ({ order, onStatusChange, onAcceptReject, updating }) => {
     onAcceptReject(order._id, "reject");
   };
 
+  const handleAddressClick = (e) => {
+    e.stopPropagation();
+    openDirections(resolvedAddress);
+  };
+
   return (
     <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
       {/* Header row */}
@@ -181,12 +198,22 @@ const OrderCard = ({ order, onStatusChange, onAcceptReject, updating }) => {
                 minute: "2-digit",
               })}
             </p>
-            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5 truncate">
-              <MapPin className="h-3 w-3 text-orange-400 flex-shrink-0" />
-              <span className="truncate">
-                {resolvedAddress || "No address on file for this customer"}
+            {resolvedAddress ? (
+              <span
+                role="button"
+                title="Get directions on Google Maps"
+                onClick={handleAddressClick}
+                className="text-xs text-gray-500 hover:text-orange-600 flex items-center gap-1 mt-0.5 truncate underline decoration-dotted underline-offset-2 w-fit"
+              >
+                <MapPin className="h-3 w-3 text-orange-400 flex-shrink-0" />
+                <span className="truncate">{resolvedAddress}</span>
               </span>
-            </p>
+            ) : (
+              <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5 truncate">
+                <MapPin className="h-3 w-3 text-orange-400 flex-shrink-0" />
+                <span className="truncate">No address on file for this customer</span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -236,14 +263,27 @@ const OrderCard = ({ order, onStatusChange, onAcceptReject, updating }) => {
       {/* Expanded detail */}
       {expanded && (
         <div className="border-t border-gray-100 px-5 py-4 space-y-4">
-          {/* Delivery address — falls back to the customer's profile address if the order has none */}
-          <div className="flex items-start gap-2 rounded-xl bg-gray-50 border border-gray-100 p-3">
+          {/* Delivery address — falls back to the customer's profile address if the order has none.
+              Clicking it opens Google Maps directions from the current location to this address. */}
+          <div
+            role={resolvedAddress ? "button" : undefined}
+            onClick={resolvedAddress ? () => openDirections(resolvedAddress) : undefined}
+            className={`flex items-start gap-2 rounded-xl bg-gray-50 border border-gray-100 p-3 ${
+              resolvedAddress ? "cursor-pointer hover:bg-orange-50 hover:border-orange-200 transition-colors" : ""
+            }`}
+          >
             <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-xs text-gray-400">Delivery address</p>
               <p className={`text-sm ${resolvedAddress ? "text-gray-700" : "text-gray-400 italic"}`}>
                 {resolvedAddress || "No address on file — the order has none saved and the customer's profile has no address either."}
               </p>
+              {resolvedAddress && (
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-600 mt-1.5">
+                  <Navigation className="h-3 w-3" />
+                  Get directions
+                </span>
+              )}
             </div>
           </div>
 

@@ -25,6 +25,41 @@ import {
 } from "lucide-react";
 import FoodCard from "./FoodCard";
 
+import saladImg from "../../assets/images/salad.jpeg";
+import parathaImg from "../../assets/images/paratha.jpeg";
+import idliImg from "../../assets/images/idli.jpeg";
+import dosaImg from "../../assets/images/dosa.jpeg";
+import chineseImg from "../../assets/images/chinese.jpeg";
+import cakesImg from "../../assets/images/cakes.jpeg";
+import burgerImg from "../../assets/images/burger.jpeg";
+import choleBhatureImg from "../../assets/images/chole_bature.jpeg";
+import iceCreamImg from "../../assets/images/ice_creams.jpeg";
+import gulabJamunImg from "../../assets/images/gulab_jamun.jpeg";
+
+const CATEGORIES = [
+  { name: "Salad", image: saladImg },
+  { name: "Paratha", image: parathaImg },
+  { name: "Idli", image: idliImg },
+  { name: "Dosa", image: dosaImg },
+  { name: "Chinese", image: chineseImg },
+  { name: "Cakes", image: cakesImg },
+  { name: "Burger", image: burgerImg },
+  { name: "Chole Bhature", image: choleBhatureImg },
+  { name: "Ice Cream", image: iceCreamImg },
+  { name: "Gulab Jamun", image: gulabJamunImg },
+];
+
+// Normalize for forgiving, case/whitespace-safe comparisons
+const norm = (val) => (val ?? "").toString().trim().toLowerCase();
+
+const matchesCategory = (food, category) => {
+  if (!category) return true;
+  return (
+    norm(food.category) === norm(category) ||
+    norm(food.name).includes(norm(category))
+  );
+};
+
 const haversineKm = (lat1, lon1, lat2, lon2) => {
   const toRad = (deg) => (deg * Math.PI) / 180;
   const R = 6371;
@@ -82,12 +117,15 @@ const CustomerBrowse = () => {
 
   // ── Sorting controls ──
   const [restaurantSort, setRestaurantSort] = useState("name_asc"); // name_asc | name_desc | distance
-  const [priceSort, setPriceSort] = useState("default"); // default | low_high | high_low
+  const [priceSort, setPriceSort] = useState("default"); // default | low_high | high_low | rating_high
   const [distances, setDistances] = useState({}); // { [restaurantId]: km }
   const [locating, setLocating] = useState(false);
 
   // ── Distance range filter ──
   const [distanceRange, setDistanceRange] = useState("all");
+
+  // ── Category (image) filter ──
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // ── Clear the navigation state so a back-navigation doesn't re-apply it ──
   useEffect(() => {
@@ -206,6 +244,10 @@ const CustomerBrowse = () => {
     }
   };
 
+  const handleCategoryClick = (name) => {
+    setSelectedCategory((prev) => (prev === name ? null : name));
+  };
+
   const filteredGroups = useMemo(() => {
     return groups
       .filter((group) =>
@@ -216,14 +258,20 @@ const CustomerBrowse = () => {
       )
       .map((group) => ({
         ...group,
-        foods: group.foods.filter((food) =>
-          food.name.toLowerCase().includes(search.toLowerCase()),
-        ),
+        foods: group.foods
+          .filter((food) =>
+            food.name.toLowerCase().includes(search.toLowerCase()),
+          )
+          .filter((food) => matchesCategory(food, selectedCategory)),
       }))
       .filter((group) => {
         // When locked to one restaurant, keep it visible even with 0 matching
         // foods so the customer can see it's empty rather than have it vanish.
         if (restaurantFilter) return true;
+
+        // If a category filter is active, only restaurants with a matching
+        // dish should show — there's no "restaurant name matches category" case.
+        if (selectedCategory) return group.foods.length > 0;
 
         const matchesRestaurant = (
           group.restaurant.restaurantName ||
@@ -234,16 +282,19 @@ const CustomerBrowse = () => {
           .includes(search.toLowerCase());
         return matchesRestaurant || group.foods.length > 0;
       });
-  }, [groups, search, restaurantFilter, distanceRange, distances]);
+  }, [groups, search, restaurantFilter, distanceRange, distances, selectedCategory]);
 
-  // ── Sort food items within each restaurant section by price ──
+  // ── Sort food items within each restaurant section by price or rating ──
   const priceSortedGroups = useMemo(() => {
     if (priceSort === "default") return filteredGroups;
     return filteredGroups.map((group) => ({
       ...group,
-      foods: [...group.foods].sort((a, b) =>
-        priceSort === "low_high" ? a.price - b.price : b.price - a.price
-      ),
+      foods: [...group.foods].sort((a, b) => {
+        if (priceSort === "low_high") return a.price - b.price;
+        if (priceSort === "high_low") return b.price - a.price;
+        if (priceSort === "rating_high") return (b.rating || 0) - (a.rating || 0);
+        return 0;
+      }),
     }));
   }, [filteredGroups, priceSort]);
 
@@ -343,7 +394,7 @@ const CustomerBrowse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8F2] px-4 py-10">
+    <div className="min-h-screen bg-[#FFF8F2] px-4 py-5">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">
           {restaurantFilter
@@ -355,6 +406,41 @@ const CustomerBrowse = () => {
             ? "Showing items from this restaurant only"
             : "Browse menus and filter or sort them the way you like"}
         </p>
+
+        {/* ── Category filter (image based) ── */}
+        <div className="flex gap-5 overflow-x-auto pb-3 mb-5 scrollbar-hide">
+          {CATEGORIES.map((cat) => {
+            const isActive = selectedCategory === cat.name;
+            return (
+              <button
+                key={cat.name}
+                onClick={() => handleCategoryClick(cat.name)}
+                className="flex flex-col items-center gap-2 shrink-0"
+              >
+                <div
+                  className={`h-16 w-16 rounded-full overflow-hidden border-2 transition ${
+                    isActive
+                      ? "border-orange-500 ring-2 ring-orange-200"
+                      : "border-gray-200"
+                  }`}
+                >
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <span
+                  className={`text-xs font-medium ${
+                    isActive ? "text-orange-500" : "text-gray-600"
+                  }`}
+                >
+                  {cat.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
         {/* ── Search ── */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -387,11 +473,24 @@ const CustomerBrowse = () => {
               <X className="h-3.5 w-3.5" />
             </button>
           )}
+
+          {selectedCategory && (
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl"
+            >
+              {selectedCategory}
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
 
         {/* ── Sort & filter controls ── */}
-        <div className="flex flex-wrap items-center gap-3 bg-white border border-gray-200 rounded-2xl p-3 shadow-sm mb-8">
-          <div className="flex items-center gap-2 min-w-[190px]">
+        {/* Kept to a single row on every screen size: it scrolls
+            horizontally on narrow (phone) viewports and fits without
+            wrapping on wide (laptop/desktop) ones. */}
+        <div className="flex flex-nowrap items-center gap-3 bg-orange-50    mb-8 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
             <UtensilsCrossed className="h-4 w-4 text-orange-500 flex-shrink-0" />
             <Select
               value={restaurantFilter || "all"}
@@ -421,7 +520,7 @@ const CustomerBrowse = () => {
             </Select>
           </div>
 
-          <div className="flex items-center gap-2 min-w-[190px]">
+          <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
             <ArrowUpDown className="h-4 w-4 text-orange-500 flex-shrink-0" />
             <Select value={restaurantSort} onValueChange={handleRestaurantSortChange}>
               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
@@ -435,22 +534,23 @@ const CustomerBrowse = () => {
             </Select>
           </div>
 
-          <div className="flex items-center gap-2 min-w-[190px]">
+          <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
             <IndianRupee className="h-4 w-4 text-orange-500 flex-shrink-0" />
             <Select value={priceSort} onValueChange={setPriceSort}>
               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
-                <SelectValue placeholder="Sort items by price" />
+                <SelectValue placeholder="Sort items" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="default">Default item order</SelectItem>
                 <SelectItem value="low_high">Price: Low to High</SelectItem>
                 <SelectItem value="high_low">Price: High to Low</SelectItem>
+                <SelectItem value="rating_high">Rating: High to Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* ── Distance range filter ── */}
-          <div className="flex items-center gap-2 min-w-[190px]">
+          <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
             <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
             <Select value={distanceRange} onValueChange={handleDistanceRangeChange}>
               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
@@ -467,7 +567,7 @@ const CustomerBrowse = () => {
           </div>
 
           {locating && (
-            <span className="flex items-center gap-1.5 text-xs text-gray-400">
+            <span className="flex items-center gap-1.5 text-xs text-gray-400 shrink-0 whitespace-nowrap">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
               Locating you & calculating distances…
             </span>
@@ -476,17 +576,18 @@ const CustomerBrowse = () => {
           {(restaurantSort === "distance" || distanceRange !== "all") && !locating && (
             <button
               onClick={handleSortByDistance}
-              className="flex items-center gap-1 text-xs text-orange-600 font-medium hover:text-orange-700 ml-auto"
+              className="flex items-center gap-1 text-xs text-orange-600 font-medium hover:text-orange-700 shrink-0 whitespace-nowrap sm:ml-auto"
             >
               <LocateFixed className="h-3.5 w-3.5" />
               Refresh location
             </button>
           )}
         </div>
-
         {sortedGroups.length === 0 ? (
           <p className="text-center text-gray-500 py-16">
-            {distanceRange !== "all"
+            {selectedCategory
+              ? `No dishes found for "${selectedCategory}".`
+              : distanceRange !== "all"
               ? "No restaurants found in this distance range."
               : "No restaurants or dishes match your search."}
           </p>
