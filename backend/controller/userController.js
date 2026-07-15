@@ -2,6 +2,7 @@ import { sendOtpMail } from "../emailVerify/sendOtpMail.js";
 import { verifyMail } from "../emailVerify/verifyMail.js";
 import { Session } from "../models/sessionModel.js";
 import { User } from "../models/user_model.js";
+import { Rider } from "../models/rider_model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/dataUri.js";
@@ -11,14 +12,23 @@ import cloudinary from "../utils/cloudinary.js";
  * Register User
  */
 export const registerUser = async (req, res) => {
-  // console.log("Request Body", req.body);
   try {
-    const { username, email, phone, password, role } = req.body;
+    const { username, email, phone, password, role, vehicleType, vehicleNumber } = req.body;
 
     if (!username || !email || !phone || !password) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
+      });
+    }
+
+    const ALLOWED_ROLES = ["customer", "restaurant", "rider"];
+    const finalRole = ALLOWED_ROLES.includes(role) ? role : "customer";
+
+    if (finalRole === "rider" && (!vehicleType || !vehicleNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "Vehicle type and vehicle number are required for riders",
       });
     }
 
@@ -39,8 +49,17 @@ export const registerUser = async (req, res) => {
       email,
       phone,
       password: hashedPassword,
-      role: role || "customer",
+      role: finalRole,
+      ...(finalRole === "rider" && { vehicleType, vehicleNumber }),
     });
+
+    if (finalRole === "rider") {
+      await Rider.create({
+        userId: newUser._id,
+        vehicleType,
+        vehicleNumber,
+      });
+    }
 
     const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
       expiresIn: "10m",
@@ -77,9 +96,6 @@ export const registerUser = async (req, res) => {
 export const verification = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    //  console.log("Body:", req.body);
-    // console.log("Params:", req.params);
-    // console.log("Authorization:", req.headers.authorization);
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -128,8 +144,6 @@ export const verification = async (req, res) => {
     });
   }
 };
-
-
 
 export const loginUser = async (req, res) => {
   try {
@@ -235,7 +249,6 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
-    // console.log(user)
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -373,9 +386,6 @@ export const changePassword = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log("USER ID:", userId);
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
 
     const { username, phone } = req.body;
     const file = req.file;
@@ -388,25 +398,10 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // update username
     if (username) {
       user.username = username;
     }
 
-    // if (phone && phone !== user.phone) {
-    //   const phoneExists = await User.findOne({ phone });
-
-    //   if (phoneExists) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: "Phone number already exists",
-    //     });
-    //   }
-
-    //   user.phone = phone;
-    // }
-
-    // update profile image ONLY if file exists
     if (file) {
       const fileUri = getDataUri(file);
 
@@ -433,9 +428,6 @@ export const updateProfile = async (req, res) => {
     });
   }
 };
-
-
-
 
 export const getCurrentUser = async (req, res) => {
   try {

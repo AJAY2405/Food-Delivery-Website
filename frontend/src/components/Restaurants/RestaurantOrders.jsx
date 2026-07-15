@@ -27,12 +27,14 @@ import {
   Bike,
   ChefHat,
   PackageCheck,
+  PackageOpen,
   CircleDot,
   MapPin,
   Navigation,
   Phone,
   Check,
   X,
+  User as UserIcon,
 } from "lucide-react";
 
 /* ── Auth headers ── */
@@ -44,7 +46,11 @@ const authHeaders = () => ({
   withCredentials: true,
 });
 
-/* ── Status config ── */
+/* ── Status config ──
+   Mirrors the `status` enum on the Order model exactly:
+   placed -> confirmed -> preparing -> ready_for_pickup
+          -> out_for_delivery (rider claims it) -> delivered
+   (or cancelled at any point before out_for_delivery). */
 const STATUS_CONFIG = {
   placed: {
     label: "Placed",
@@ -60,6 +66,11 @@ const STATUS_CONFIG = {
     label: "Preparing",
     color: "bg-yellow-100 text-yellow-700",
     icon: <ChefHat className="h-3.5 w-3.5" />,
+  },
+  ready_for_pickup: {
+    label: "Ready for Pickup",
+    color: "bg-purple-100 text-purple-700",
+    icon: <PackageOpen className="h-3.5 w-3.5" />,
   },
   out_for_delivery: {
     label: "Out for Delivery",
@@ -79,6 +90,14 @@ const STATUS_CONFIG = {
 };
 
 const ALL_STATUSES = Object.keys(STATUS_CONFIG);
+
+/* Statuses a restaurant is actually allowed to set from the dropdown —
+   kept in lockstep with RESTAURANT_SETTABLE in restaurantController.js.
+   "placed" is handled by the Accept/Reject buttons, and
+   "out_for_delivery"/"delivered" are rider-owned (set via
+   riderController.pickOrder / markDelivered), so none of those belong
+   in this list even though they're valid statuses overall. */
+const RESTAURANT_SETTABLE_STATUSES = ["confirmed", "preparing", "ready_for_pickup", "cancelled"];
 
 /* ── Helpers ── */
 const fmt = (n) =>
@@ -159,6 +178,16 @@ const OrderCard = ({ order, onStatusChange, onAcceptReject, updating }) => {
      customer's profile address if the order was created without one. */
   const resolvedAddress = order.deliveryAddress || order.customer?.address;
   const customerPhone = order.customer?.phone;
+
+  /* Rider is only populated once someone has claimed the order
+     (Order.rider stays null until riderController.pickOrder runs). */
+  const rider = order.rider;
+  const hasRiderAssigned = Boolean(rider?._id || rider);
+
+  /* Once a rider owns the order (out_for_delivery/delivered), the
+     restaurant can no longer change status — matches the backend's
+     "Cannot update a {status} order" guard in updateOrderStatus. */
+  const isDropdownLocked = ["delivered", "cancelled", "out_for_delivery"].includes(order.status);
 
   const handleAccept = (e) => {
     e.stopPropagation();
@@ -303,6 +332,41 @@ const OrderCard = ({ order, onStatusChange, onAcceptReject, updating }) => {
             </div>
           )}
 
+          {/* Assigned rider — only shows once someone has claimed the order
+              (order.rider is null until pickOrder runs). getRestaurantOrders
+              already populates username/phone/vehicleType/vehicleNumber, this
+              just surfaces it. */}
+          {hasRiderAssigned && (
+            <div className="flex items-center gap-2 rounded-xl bg-orange-50 border border-orange-100 p-3">
+              <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <Bike className="h-4 w-4 text-orange-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-400">
+                  {order.status === "delivered" ? "Delivered by" : "Rider on the way"}
+                </p>
+                <p className="text-sm text-gray-800 font-medium truncate">
+                  {rider.username || "Rider"}
+                  {rider.vehicleType && (
+                    <span className="text-gray-400 font-normal capitalize"> · {rider.vehicleType}</span>
+                  )}
+                  {rider.vehicleNumber && (
+                    <span className="text-gray-400 font-normal"> ({rider.vehicleNumber})</span>
+                  )}
+                </p>
+                {rider.phone && (
+                  <a
+                    href={`tel:${rider.phone}`}
+                    className="text-xs text-orange-600 hover:text-orange-700 font-medium inline-flex items-center gap-1 mt-0.5"
+                  >
+                    <Phone className="h-3 w-3" />
+                    {rider.phone}
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Items list */}
           <div className="space-y-2">
             {order.items.map((item, i) => (
@@ -369,26 +433,36 @@ const OrderCard = ({ order, onStatusChange, onAcceptReject, updating }) => {
             </div>
           )}
 
-          {/* Status update — for orders already accepted, move it further along */}
+          {/* Status update — for orders already accepted, move it further along.
+              Only offers statuses the restaurant is actually allowed to set;
+              once a rider owns the order (out_for_delivery/delivered/cancelled)
+              this is locked, matching the backend guard. */}
           {!isNewOrder && (
             <div className="flex items-center gap-3 pt-1">
               <p className="text-xs text-gray-500 font-medium">Update status:</p>
-              <Select
-                value={order.status}
-                onValueChange={(val) => onStatusChange(order._id, val)}
-                disabled={isBusy || order.status === "delivered" || order.status === "cancelled"}
-              >
-                <SelectTrigger className="h-8 text-xs rounded-xl border-gray-200 w-44">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ALL_STATUSES.map((s) => (
-                    <SelectItem key={s} value={s} className="text-xs">
-                      {STATUS_CONFIG[s].label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isDropdownLocked ? (
+                <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${cfg.color}`}>
+                  {cfg.icon}
+                  {cfg.label}
+                </span>
+              ) : (
+                <Select
+                  value={order.status}
+                  onValueChange={(val) => onStatusChange(order._id, val)}
+                  disabled={isBusy}
+                >
+                  <SelectTrigger className="h-8 text-xs rounded-xl border-gray-200 w-44">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESTAURANT_SETTABLE_STATUSES.map((s) => (
+                      <SelectItem key={s} value={s} className="text-xs">
+                        {STATUS_CONFIG[s].label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               {isBusy && <Loader2 className="h-4 w-4 animate-spin text-orange-500" />}
             </div>
           )}
@@ -612,7 +686,7 @@ const RestaurantOrders = () => {
               label="In Progress"
               value={orders.filter(
                 (o) =>
-                  ["placed", "confirmed", "preparing", "out_for_delivery"].includes(o.status)
+                  ["placed", "confirmed", "preparing", "ready_for_pickup", "out_for_delivery"].includes(o.status)
               ).length}
               sub="active orders"
               icon={<Clock className="h-4 w-4 text-yellow-500" />}

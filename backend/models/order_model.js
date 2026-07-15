@@ -1,3 +1,4 @@
+
 // models/order.model.js
 import mongoose from "mongoose";
 
@@ -20,21 +21,35 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    /* Set the moment a rider claims the order. Stays null until then. */
+    rider: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
     items: [orderItemSchema],
 
     subtotal: { type: Number, required: true },
     deliveryFee: { type: Number, default: 30 },
     total: { type: Number, required: true },
 
+    
     status: {
       type: String,
-      enum: ["placed", "confirmed", "preparing", "out_for_delivery", "delivered", "cancelled"],
+      enum: [
+        "placed",
+        "confirmed",
+        "preparing",
+        "ready_for_pickup",
+        "out_for_delivery",
+        "delivered",
+        "cancelled",
+      ],
       default: "placed",
     },
 
-    /* Only set when status === "cancelled" — tells us whether the
-       customer backed out or the restaurant rejected the order, so
-       the UI can show the right message on either side. */
     cancelledBy: {
       type: String,
       enum: ["customer", "restaurant"],
@@ -56,6 +71,10 @@ const orderSchema = new mongoose.Schema(
     razorpayPaymentId: { type: String },
 
     deliveryAddress: { type: String },
+
+    /* Rider-side timeline */
+    pickedAt: { type: Date, default: null },
+    deliveredAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

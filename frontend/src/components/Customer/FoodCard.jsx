@@ -96,22 +96,38 @@ const FoodCard = ({ food, onAddToCart }) => {
 
       {/* ================= Details Modal ================= */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl">
+        {/*
+          shadcn's DialogContent renders its own built-in close button
+          (Radix's Dialog.Close, unstyled "X", positioned top-4 right-4)
+          as a direct <button> child — it was rendering right on top of
+          our custom white-circle close button below, which is what
+          made the corner look broken/doubled in the screenshot.
+          `[&>button]:hidden` hides that one built-in button without
+          touching the shared ui/dialog.jsx file (so every other dialog
+          in the app keeps its default close button as-is).
+        */}
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl [&>button]:hidden">
           <div className="relative">
             <img
               src={food.image || "https://placehold.co/500x300?text=Food"}
               alt={food.name}
               className="w-full h-56 object-cover"
             />
+
+            {/* Subtle top gradient so the close button stays legible
+                over bright/busy food photos too. */}
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent pointer-events-none" />
+
             <button
               onClick={() => setOpen(false)}
-              className="absolute top-3 right-3 bg-white/90 hover:bg-white rounded-full p-1.5 shadow"
+              className="absolute top-4 right-4 z-20 bg-white hover:bg-gray-100 rounded-full p-1.5 shadow-md border border-black/5"
+              aria-label="Close"
             >
-              <X className="h-4 w-4 text-black-700" />
+              <X className="h-4 w-4 text-gray-700" />
             </button>
 
             <span
-              className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold text-white ${
+              className={`absolute top-4 left-4 z-10 px-3 py-1 rounded-full text-xs font-semibold text-white ${
                 food.type?.toLowerCase() === "veg" ? "bg-green-600" : "bg-red-600"
               }`}
             >
@@ -119,7 +135,7 @@ const FoodCard = ({ food, onAddToCart }) => {
             </span>
 
             <span
-              className={`absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
+              className={`absolute bottom-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-semibold ${
                 food.isAvailable
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"

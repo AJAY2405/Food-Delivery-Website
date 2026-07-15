@@ -4,7 +4,6 @@ import {
   Loader2,
   Calendar,
   Store,
-  ReceiptIndianRupee,
   PackageCheck,
   CircleDot,
   CheckCircle2,
@@ -16,6 +15,7 @@ import {
   ArrowLeft,
   ThumbsDown,
   Star,
+  MapPin,
 } from "lucide-react";
 import RatingModal from "./RatingModal";
 import { toast } from "sonner";
@@ -42,17 +42,23 @@ const STATUS_CONFIG = {
     icon: <ChefHat className="h-3.5 w-3.5" />,
     step: 3,
   },
+  ready_for_pickup: {
+    label: "Ready for Pickup",
+    color: "bg-amber-100 text-amber-700",
+    icon: <PackageCheck className="h-3.5 w-3.5" />,
+    step: 4,
+  },
   out_for_delivery: {
     label: "Out for Delivery",
     color: "bg-orange-100 text-orange-700",
     icon: <Bike className="h-3.5 w-3.5" />,
-    step: 4,
+    step: 5,
   },
   delivered: {
     label: "Delivered",
     color: "bg-green-100 text-green-700",
     icon: <PackageCheck className="h-3.5 w-3.5" />,
-    step: 5,
+    step: 6,
   },
   cancelled: {
     label: "Cancelled",
@@ -62,10 +68,11 @@ const STATUS_CONFIG = {
   },
 };
 
-const STEPS = ["placed", "confirmed", "preparing", "out_for_delivery", "delivered"];
+const STEPS = ["placed", "confirmed", "preparing", "ready_for_pickup", "out_for_delivery", "delivered"];
 
-/* Customers can only cancel while the order hasn't left the kitchen */
-const CANCELLABLE_STATUSES = ["placed", "confirmed"];
+/* Customers can cancel any time before a rider has physically picked
+   the food up — matches CANCELLABLE in order_controller.js */
+const CANCELLABLE_STATUSES = ["placed", "confirmed", "preparing", "ready_for_pickup"];
 
 const fmt = (n) =>
   new Intl.NumberFormat("en-IN", {
@@ -96,6 +103,15 @@ const OrderStatusBanner = ({ order }) => {
       <div className="flex items-center gap-2 rounded-xl bg-indigo-50 border border-indigo-100 px-3 py-2 text-sm text-indigo-700">
         <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
         The restaurant accepted your order and will start preparing it soon.
+      </div>
+    );
+  }
+
+  if (order.status === "out_for_delivery" && order.rider) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl bg-orange-50 border border-orange-100 px-3 py-2 text-sm text-orange-700">
+        <Bike className="h-4 w-4 flex-shrink-0" />
+        {order.rider.username} has picked up your order and is on the way.
       </div>
     );
   }
@@ -171,6 +187,7 @@ const StatusStepper = ({ status }) => {
 
 /* ── Single order card ── */
 const OrderCard = ({ order, onCancel, cancelling }) => {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [ratings, setRatings] = useState({});
   const [ratingsLoaded, setRatingsLoaded] = useState(false);
@@ -258,6 +275,17 @@ const OrderCard = ({ order, onCancel, cancelling }) => {
 
           {/* Progress stepper */}
           <StatusStepper status={order.status} />
+
+          {/* Track rider — only once a rider has actually picked it up */}
+          {order.status === "out_for_delivery" && (
+            <Button
+              onClick={() => navigate(`/order/${order._id}/track`)}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl h-9"
+            >
+              <MapPin className="h-3.5 w-3.5 mr-1.5" />
+              Track Rider Live
+            </Button>
+          )}
 
           {/* Items */}
           <div className="space-y-2">
@@ -439,6 +467,7 @@ const OrderHistory = () => {
     { key: "placed", label: "Placed" },
     { key: "confirmed", label: "Accepted" },
     { key: "preparing", label: "Preparing" },
+    { key: "ready_for_pickup", label: "Ready for Pickup" },
     { key: "out_for_delivery", label: "Out for Delivery" },
     { key: "delivered", label: "Delivered" },
     { key: "cancelled", label: "Cancelled / Rejected" },

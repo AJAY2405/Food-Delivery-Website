@@ -27,6 +27,8 @@ const Signup = () => {
     phone: "",
     password: "",
     role: "customer",
+    vehicleType: "bike",
+    vehicleNumber: "",
   });
 
   const handleChange = (e) => {
@@ -52,6 +54,10 @@ const Signup = () => {
 
     if (formData.phone.length !== 10) {
       return toast.error("Phone number must be 10 digits");
+    }
+
+    if (formData.role === "rider" && !formData.vehicleNumber) {
+      return toast.error("Vehicle number is required for riders");
     }
 
     try {
@@ -186,8 +192,45 @@ const Signup = () => {
               >
                 <option value="customer">Customer</option>
                 <option value="restaurant">Restaurant</option>
+                <option value="rider">Delivery Rider</option>
               </select>
             </div>
+
+            {/* Rider-only fields */}
+            {formData.role === "rider" && (
+              <div className="grid grid-cols-2 gap-3 rounded-xl bg-orange-50/60 border border-orange-100 p-3">
+                <div>
+                  <Label htmlFor="vehicleType" className="text-xs font-medium">
+                    Vehicle Type
+                  </Label>
+                  <select
+                    id="vehicleType"
+                    name="vehicleType"
+                    value={formData.vehicleType}
+                    onChange={handleChange}
+                    className="mt-1 w-full h-9 rounded-md border border-orange-200 bg-white px-2 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+                  >
+                    <option value="bike">Motorbike</option>
+                    <option value="scooter">Scooter</option>
+                    <option value="bicycle">Bicycle</option>
+                    <option value="car">Car</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="vehicleNumber" className="text-xs font-medium">
+                    Vehicle Number
+                  </Label>
+                  <Input
+                    id="vehicleNumber"
+                    name="vehicleNumber"
+                    placeholder="DL 01 AB 1234"
+                    value={formData.vehicleNumber}
+                    onChange={handleChange}
+                    className="mt-1 focus-visible:ring-orange-400"
+                  />
+                </div>
+              </div>
+            )}
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4">

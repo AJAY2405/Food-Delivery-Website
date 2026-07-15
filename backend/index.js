@@ -9,6 +9,9 @@ import paymentRoutes from "./routes/payment_routes.js";
 import orderRouter from "./routes/order_routes.js";
 import ratingRoute from "./routes/rating_route.js"
 import { backfillFoodRatings } from "./scripts/backfillFoodRatings.js";
+import { initSocket } from "./utils/socket.js";
+import riderRoutes from "./routes/riderRoutes.js";
+import { createServer } from "http";
 
 
 
@@ -37,9 +40,20 @@ app.use("/api/v1/restaurant", restaurantRoute);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/order", orderRouter);
 app.use("/api/v1/rating", ratingRoute);
-
-
+app.use("/api/v1/rider", riderRoutes);
 
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const httpServer = createServer(app);
+initSocket(httpServer);
+
+
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+
+
+
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

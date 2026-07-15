@@ -62,7 +62,13 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(res.data.user));
         setUser(res.data.user);
         toast.success(res.data.message);
-        navigate("/");
+
+        // Riders land on their own dashboard, everyone else goes home.
+        if (res.data.user.role === "rider") {
+          navigate("/rider");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       toast.error(

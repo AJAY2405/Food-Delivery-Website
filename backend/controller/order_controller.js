@@ -1,5 +1,6 @@
 // controllers/order_controller.js
 import Order from "../models/order_model.js";
+import { getIO } from "../utils/socket.js";
 
 export const getRestaurantOrders = async (req, res) => {
   try {
@@ -7,6 +8,7 @@ export const getRestaurantOrders = async (req, res) => {
 
     const orders = await Order.find({ restaurant: restaurantId })
       .populate("customer", "username email phone address")
+      .populate("rider", "username phone vehicleType vehicleNumber")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -109,25 +111,26 @@ export const rejectOrder = async (req, res) => {
   }
 };
 
+/*
+  Restaurant-controlled statuses only go up to "ready_for_pickup".
+  From there, a rider claims the order (via riderController.pickOrder),
+  which is what actually flips it to "out_for_delivery" — and only the
+  assigned rider can later mark it "delivered". This keeps a single
+  writer for each transition instead of both the restaurant and the
+  rider racing to update the same field.
+*/
 export const updateOrderStatus = async (req, res) => {
   try {
     const restaurantId = req.userId;
     const { orderId } = req.params;
     const { status } = req.body;
 
-    const VALID_STATUSES = [
-      "placed",
-      "confirmed",
-      "preparing",
-      "out_for_delivery",
-      "delivered",
-      "cancelled",
-    ];
+    const RESTAURANT_SETTABLE = ["confirmed", "preparing", "ready_for_pickup", "cancelled"];
 
-    if (!status || !VALID_STATUSES.includes(status)) {
+    if (!status || !RESTAURANT_SETTABLE.includes(status)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}`,
+        message: `Invalid status. Restaurants can set: ${RESTAURANT_SETTABLE.join(", ")}. Delivery pickup and drop-off are handled by the rider.`,
       });
     }
 
@@ -144,8 +147,8 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    /* Prevent updating terminal statuses */
-    if (order.status === "delivered" || order.status === "cancelled") {
+    /* Prevent updating terminal / rider-owned statuses */
+    if (["delivered", "cancelled", "out_for_delivery"].includes(order.status)) {
       return res.status(400).json({
         success: false,
         message: `Cannot update a ${order.status} order`,
@@ -160,7 +163,18 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     order.status = status;
+    if (status === "cancelled") order.cancelledBy = "restaurant";
     await order.save();
+
+    // Food's packed and waiting — let every online rider know.
+    if (status === "ready_for_pickup") {
+      getIO().to("riders").emit("order:ready", { orderId: order._id });
+    }
+
+    getIO().to(`order_${order._id}`).emit("order:status", {
+      orderId: order._id,
+      status: order.status,
+    });
 
     return res.status(200).json({
       success: true,
@@ -176,14 +190,13 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-
-
 export const getCustomerOrders = async (req, res) => {
   try {
     const customerId = req.userId;
 
     const orders = await Order.find({ customer: customerId })
       .populate("restaurant", "username restaurantName photoUrl avatar")
+      .populate("rider", "username phone vehicleType vehicleNumber avatar photoUrl")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -199,31 +212,30 @@ export const getCustomerOrders = async (req, res) => {
   }
 };
 
-
-
-
 export const cancelOrder = async (req, res) => {
   try {
     const customerId = req.userId;
     const { orderId } = req.params;
- 
+
     const order = await Order.findOne({ _id: orderId, customer: customerId });
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
- 
-    const CANCELLABLE = ["placed", "confirmed"];
+
+    // Customer can still back out any time before a rider has physically
+    // picked the food up — once it's "out_for_delivery" it's too late.
+    const CANCELLABLE = ["placed", "confirmed", "preparing", "ready_for_pickup"];
     if (!CANCELLABLE.includes(order.status)) {
       return res.status(400).json({
         success: false,
         message: `Cannot cancel an order that is already "${order.status}"`,
       });
     }
- 
+
     order.status = "cancelled";
     order.cancelledBy = "customer";
     await order.save();
- 
+
     return res.status(200).json({
       success: true,
       message: "Order cancelled successfully",

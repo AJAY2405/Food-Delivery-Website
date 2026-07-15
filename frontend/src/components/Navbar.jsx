@@ -32,6 +32,7 @@ import {
   LogOut,
   ChefHat,
   PackageCheck,
+  Bike,
 } from "lucide-react";
 import avatar6 from "../assets/avatar6.jpg";
 import { getData } from "@/context/userContext";
@@ -95,24 +96,16 @@ const Navbar = () => {
 
   /* ── Role-based nav links ── */
   const getNavLinks = () => {
-    const commonLinks = [
-      // { to: "/", label: "Home", icon: <Home className="h-4 w-4" /> },
-      // { to: "/about", label: "About", icon: <Info className="h-4 w-4" /> },
-    ];
-
+    const commonLinks = [];
     if (!user) return commonLinks;
 
     switch (user.role) {
       case "customer":
-        return [
-         
-        ];
-
+        return [];
       case "restaurant":
-        return [
-          
-        ];
-
+        return [];
+      case "rider":
+        return [];
       default:
         return commonLinks;
     }
@@ -166,6 +159,30 @@ const Navbar = () => {
           },
         ];
 
+      case "rider":
+        return [
+          {
+            to: "/rider",
+            label: "Rider Dashboard",
+            icon: <LayoutDashboard className="mr-2 h-4 w-4" />,
+          },
+          {
+            to: "/rider/available-orders",
+            label: "Available Orders",
+            icon: <PackageCheck className="mr-2 h-4 w-4" />,
+          },
+          {
+            to: "/rider/picked-orders",
+            label: "My Deliveries",
+            icon: <Bike className="mr-2 h-4 w-4" />,
+          },
+          {
+            to: "/rider/profile",
+            label: "Profile",
+            icon: <User className="mr-2 h-4 w-4" />,
+          },
+        ];
+
       default:
         return [];
     }
@@ -181,6 +198,13 @@ const Navbar = () => {
 
   const navLinks = getNavLinks();
   const dropdownItems = getDropdownItems();
+
+  /* ── Role badge color ── */
+  const roleBadgeColor = {
+    restaurant: "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400",
+    rider: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400",
+    customer: "bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400",
+  };
 
   return (
     <>
@@ -205,9 +229,7 @@ const Navbar = () => {
               {user && (
                 <span
                   className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${
-                    user.role === "restaurant"
-                      ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400"
-                      : "bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400"
+                    roleBadgeColor[user.role] || roleBadgeColor.customer
                   }`}
                 >
                   {user.role}
@@ -299,20 +321,6 @@ const Navbar = () => {
         {/* ── Mobile Menu ── */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-orange-900 bg-white/95 dark:bg-black/95 backdrop-blur-xl px-4 py-4 space-y-3">
-
-            {/* Nav links */}
-            {/* <div className="space-y-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={navLinkStyle(link.to)}
-                >
-                  {link.icon}
-                  {link.label}
-                </Link>
-              ))}
-            </div> */}
 
             <div className="pt-3 border-t border-gray-100 dark:border-orange-900/40">
               {user ? (
