@@ -1,5 +1,9 @@
 import dns from "node:dns";
+import net from "node:net";                    // ← new import
+
 dns.setDefaultResultOrder("ipv4first");
+net.setDefaultAutoSelectFamily(false); 
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
