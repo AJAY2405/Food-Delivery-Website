@@ -138,7 +138,7 @@ const Navbar = () => {
       case "restaurant":
         return [
           {
-            to: "/profile",
+            to: "/restaurant/account",
             label: "Restaurant Profile",
             icon: <ChefHat className="mr-2 h-4 w-4" />,
           },
