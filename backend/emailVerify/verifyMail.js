@@ -65,12 +65,13 @@ import handlebars from "handlebars";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Built once, reused for every call instead of recreated every send —
-// createTransport() is cheap but there's no reason to pay it per email.
+console.log(process.env.MAIL_HOST);
+console.log(process.env.MAIL_PORT);
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: process.env.MAIL_PORT,
+
+
   secure: false,
   auth: {
     user: process.env.MAIL_USER,
@@ -101,12 +102,6 @@ export const verifyMail = async (token, email) => {
     console.log("Verification email sent:", info.messageId);
     return { success: true };
   } catch (error) {
-    // Log and return — never throw here. This function is called from
-    // registerUser without being awaited/caught there, so an uncaught
-    // throw becomes an unhandled exception that crashes the whole
-    // Node process (exactly what happened on Render). A failed email
-    // should mean "the user can request a resend later", not "every
-    // other request on the server goes down too".
     console.error("verifyMail failed:", error.message);
     return { success: false, error: error.message };
   }
