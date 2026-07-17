@@ -105,7 +105,7 @@ const RestaurantAccount = () => {
           </div>
           <Button
             className="bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-sm hidden sm:flex items-center gap-2"
-            onClick={() => navigate("restaurant/profile")}
+            onClick={() => navigate("/restaurant/profile")}
           >
             <Edit className="h-4 w-4" />
             Edit Profile
