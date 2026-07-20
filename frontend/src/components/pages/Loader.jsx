@@ -1,6 +1,5 @@
-// src/components/common/Loader.jsx
-
 import { useEffect, useState } from "react";
+import Logo from "../../assets/Logo.png"; 
 
 const Loader = () => {
   const [progress, setProgress] = useState(0);
@@ -24,7 +23,14 @@ const Loader = () => {
 
   return (
     <div className="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
-      {/* Logo */}
+      {/* Restaurant Logo */}
+      <img
+        src={Logo}
+        alt="QuickBite Logo"
+        className="w-28 h-28 object-contain mb-2 animate-pulse"
+      />
+
+      {/* Logo Text */}
       <h1 className="text-4xl font-extrabold mb-8">
         Quick<span className="text-orange-500">Bite</span>
       </h1>

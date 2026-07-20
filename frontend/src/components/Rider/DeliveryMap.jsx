@@ -19,7 +19,7 @@ const pill = (bg, glyph) =>
 
 const riderIcon = pill("#10b981", "🏍️");
 const restaurantIcon = pill("#f97316", "🍴");
-const customerIcon = pill("#3b82f6", "📍");
+const customerIcon = pill("#3b82f6", "👤");
 
 const FitBounds = ({ points }) => {
   const map = useMap();

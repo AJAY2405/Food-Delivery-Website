@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, Phone, Loader2, Navigation, Clock } from "lucide-react";
+import { ArrowLeft, Phone, Loader2, Navigation, Clock, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSocket } from "@/context/socketContext";
 import DeliveryMap from "@/components/Rider/DeliveryMap";
@@ -23,6 +23,16 @@ const distanceKm = (a, b) => {
     Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
 };
+
+/* Reticle framing — the recurring signature element for this screen. */
+const Brackets = ({ className = "", color = "border-amber-400/70" }) => (
+  <>
+    <span className={`pointer-events-none absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 rounded-tl-md ${color} ${className}`} />
+    <span className={`pointer-events-none absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 rounded-tr-md ${color} ${className}`} />
+    <span className={`pointer-events-none absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 rounded-bl-md ${color} ${className}`} />
+    <span className={`pointer-events-none absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 rounded-br-md ${color} ${className}`} />
+  </>
+);
 
 const TrackRider = () => {
   const { orderId } = useParams();
@@ -90,14 +100,27 @@ const TrackRider = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-[#FFF8F2]">
-        <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+      <div className="flex justify-center items-center min-h-screen bg-[#0B1210]">
+        <div className="relative flex h-14 w-14 items-center justify-center">
+          <span className="beacon-ring absolute inline-flex h-full w-full rounded-full bg-amber-400/40" />
+          <Loader2 className="h-6 w-6 animate-spin text-amber-300" />
+        </div>
+        <style>{`
+          @keyframes beacon-sweep { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(2.2); opacity: 0; } }
+          .beacon-ring { animation: beacon-sweep 1.8s cubic-bezier(0.2, 0.6, 0.4, 1) infinite; }
+        `}</style>
       </div>
     );
   }
 
   if (!order) {
-    return <p className="text-center text-gray-500 py-20">Order not found.</p>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#0B1210]">
+        <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+          Order not found
+        </p>
+      </div>
+    );
   }
 
   const restaurantPos =
@@ -106,7 +129,17 @@ const TrackRider = () => {
       : null;
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-100">
+    <div className="relative h-screen w-full overflow-hidden bg-[#0B1210]">
+      <style>{`
+        @keyframes beacon-sweep {
+          0% { transform: scale(0.6); opacity: 0.9; }
+          100% { transform: scale(2.2); opacity: 0; }
+        }
+        .beacon-ring {
+          animation: beacon-sweep 1.8s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+        }
+      `}</style>
+
       {/* ── Full-bleed map ── */}
       <DeliveryMap
         rider={riderPos}
@@ -115,58 +148,83 @@ const TrackRider = () => {
         height="100%"
       />
 
-      {/* ── Floating top bar: back + rider info + call ── */}
+      {/* ── Floating top console: back + rider info + call ── */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex items-start gap-2">
         <button
           onClick={() => navigate(-1)}
-          className="h-11 w-11 shrink-0 rounded-full bg-white shadow-lg flex items-center justify-center"
+          className="h-11 w-11 shrink-0 rounded-md bg-[#0B1210]/90 backdrop-blur-md border border-amber-400/20 shadow-lg flex items-center justify-center active:scale-95 transition-transform"
         >
-          <ArrowLeft className="h-4 w-4 text-gray-700" />
+          <ArrowLeft className="h-4 w-4 text-amber-100" />
         </button>
 
-        <div className="flex-1 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center justify-between">
-          <div className="min-w-0">
-            <p className="font-semibold text-gray-900 truncate">
-              {order.rider?.username || "Rider"}
-            </p>
-            <p className="text-xs text-gray-400 capitalize truncate">
-              {order.rider ? `${order.rider.vehicleType || "Bike"} · ${order.rider.vehicleNumber || ""}` : "Waiting for a rider to be assigned"}
-            </p>
+        <div className="relative flex-1 rounded-md bg-[#0B1210]/90 backdrop-blur-md border border-amber-400/20 shadow-lg px-4 py-3 flex items-center justify-between">
+          <Brackets />
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              {riderPos && (
+                <span className="beacon-ring absolute inline-flex h-full w-full rounded-full bg-amber-400" />
+              )}
+              <span
+                className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
+                  riderPos ? "bg-amber-400" : "bg-zinc-500"
+                }`}
+              />
+            </span>
+            <div className="min-w-0">
+              <p className="font-bold uppercase tracking-widest text-[11px] text-amber-100 truncate">
+                {order.rider?.username || "Rider"}
+              </p>
+              <p className="font-mono text-[10px] text-zinc-400 capitalize truncate">
+                {order.rider
+                  ? `${order.rider.vehicleType || "Bike"} · ${order.rider.vehicleNumber || ""}`
+                  : "Waiting for a rider to be assigned"}
+              </p>
+            </div>
           </div>
           {order.rider?.phone && (
-            <a href={`tel:${order.rider.phone}`} className="shrink-0">
-              <Button size="sm" variant="outline" className="rounded-full border-orange-200 text-orange-600 hover:bg-orange-50">
-                <Phone className="h-3.5 w-3.5 mr-1.5" /> Call Rider
+            <a href={`tel:${order.rider.phone}`} className="shrink-0 ml-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-md border-amber-400/30 bg-transparent text-amber-300 hover:bg-amber-400/10 hover:text-amber-200"
+              >
+                <Phone className="h-3.5 w-3.5 mr-1.5" /> Call
               </Button>
             </a>
           )}
         </div>
       </div>
 
-      {/* ── Floating bottom card: status / ETA / open in maps ── */}
+      {/* ── Floating bottom console: status / ETA / open in maps ── */}
       <div className="absolute bottom-3 left-3 right-3 z-[1000]">
-        <div className="bg-white rounded-2xl shadow-lg px-4 py-3.5 flex items-center justify-between">
+        <div className="relative bg-[#0B1210]/90 backdrop-blur-md border border-amber-400/20 rounded-md shadow-lg px-4 py-3.5 flex items-center justify-between">
+          <Brackets />
           <div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full capitalize mb-1">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2 py-1 rounded capitalize mb-1.5">
+              <Radio className="h-3 w-3" />
               {order.status.replace(/_/g, " ")}
             </span>
             {eta ? (
-              <p className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-emerald-500" />
-                {eta.mins} min away · {eta.km} km
+              <p className="font-mono text-sm font-bold text-amber-50 flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-amber-300" />
+                {eta.mins} min
+                <span className="text-zinc-500 font-normal">· {eta.km} km away</span>
               </p>
             ) : (
-              <p className="text-sm text-gray-400">Waiting for rider's location…</p>
+              <p className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
+                Waiting for signal…
+              </p>
             )}
           </div>
 
           {riderPos && (
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${riderPos.lat},${riderPos.lng}`}
-              target="_blank" rel="noreferrer"
-              className="flex items-center gap-1 text-xs font-semibold text-orange-600"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-widest text-amber-300 hover:text-amber-200 shrink-0 ml-3"
             >
-              <Navigation className="h-3.5 w-3.5" /> Open in Maps
+              <Navigation className="h-3.5 w-3.5" /> Open Maps
             </a>
           )}
         </div>
