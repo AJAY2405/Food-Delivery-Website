@@ -11,7 +11,7 @@ export const isAuthenticated = async(req, res, next) =>{
         if(!authHeader || !authHeader.startsWith('Bearer')){
             return res.status(401).json({
                 success:false,
-                message:'Access token is missing or invalid'
+                message:'Please Login'
             })
         }
 
@@ -22,12 +22,12 @@ export const isAuthenticated = async(req, res, next) =>{
                 if(err.name === "TokenExpiredError"){
                     return res.status(400).json({
                         success:false,
-                        message:"Access Token has expired, use refreshtoken to generate again"
+                        message:"Please Login"
                     })
                 }
                 return res.status(400).json({
                     success:false,
-                    message:"Access token is missing or invalid"
+                    message:"Please Login"
                 })
             }
 

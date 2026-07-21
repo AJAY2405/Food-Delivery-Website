@@ -497,12 +497,12 @@ const OrderHistory = () => {
 
         {/* Header */}
         <div className="flex items-center gap-3">
-          <button
+          {/* <button
             onClick={() => navigate(-1)}
             className="h-9 w-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center hover:border-orange-300 transition-colors shadow-sm"
           >
             <ArrowLeft className="h-4 w-4 text-gray-600" />
-          </button>
+          </button> */}
           <div>
             <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
             <p className="text-sm text-gray-500">

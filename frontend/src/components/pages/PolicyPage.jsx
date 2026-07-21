@@ -44,7 +44,7 @@ export default function PolicyPage() {
   return (
     <div className="min-h-screen bg-orange-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-orange-300 via-orange-300 to-orange-300 text-white">
+      <section className="bg-gradient-to-r from-orange-400 via-orange-400 to-orange-400 text-white">
         <div className="max-w-7xl mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl font-bold mb-4">
             Our Policies
@@ -69,7 +69,7 @@ export default function PolicyPage() {
                 className="bg-white rounded-2xl p-8 border border-orange-100 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
               >
                 <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mb-6">
-                  <Icon size={30} className="text-orange-300" />
+                  <Icon size={30} className="text-orange-400" />
                 </div>
 
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -87,7 +87,7 @@ export default function PolicyPage() {
 
       {/* Contact Section */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="bg-orange-300 rounded-3xl p-10 text-center text-white shadow-xl">
+        <div className="bg-orange-400 rounded-3xl p-10 text-center text-white shadow-xl">
           <Mail className="mx-auto mb-5" size={42} />
 
           <h2 className="text-3xl font-bold mb-4">

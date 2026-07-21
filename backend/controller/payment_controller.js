@@ -90,6 +90,23 @@ export const verifyPayment = async (req, res) => {
       });
     }
 
+
+
+    //  /* ── Idempotency guard ──
+    //    If the webhook already created/updated an order for this
+    //    razorpay_order_id (e.g. it arrived slightly before this request,
+    //    or the customer double-clicked something client-side), don't
+    //    create a second order for the same payment. */
+    // const existingOrder = await Order.findOne({ razorpayOrderId: razorpay_order_id });
+    // if (existingOrder) {
+    //   return res.status(200).json({
+    //     success: true,
+    //     message: "Order already placed for this payment",
+    //     orderId: existingOrder._id,
+    //   });
+    // }
+
+
     /* ── Fetch cart ── */
     const cart = await Cart.findOne({ customer: customerId }).populate([
       { path: "items.food", select: "name price image type isAvailable" },
@@ -156,3 +173,90 @@ export const verifyPayment = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+
+
+
+  // ──────────────────────────────────────────────────────────────── */
+// export const handleRazorpayWebhook = async (req, res) => {
+//   try {
+//     const signature = req.headers["x-razorpay-signature"];
+ 
+//     if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+//       console.error(" RAZORPAY_WEBHOOK_SECRET missing from .env");
+//       return res.status(500).json({ success: false, message: "Webhook not configured" });
+//     }
+ 
+//     if (!signature) {
+//       return res.status(400).json({ success: false, message: "Missing signature" });
+//     }
+ 
+//     // req.body is a raw Buffer here because of express.raw() in app.js —
+//     // do NOT JSON.parse before verifying, the signature is computed over
+//     // the exact raw bytes Razorpay sent.
+//     const expectedSignature = crypto
+//       .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
+//       .update(req.body)
+//       .digest("hex");
+ 
+//     if (expectedSignature !== signature) {
+//       console.warn(" Webhook signature mismatch — possible spoofed request");
+//       return res.status(400).json({ success: false, message: "Invalid signature" });
+//     }
+ 
+//     const event = JSON.parse(req.body.toString());
+ 
+//     if (event.event === "payment.captured") {
+//       const payment = event.payload.payment.entity;
+//       const razorpayOrderId = payment.order_id;
+ 
+//       const order = await Order.findOne({ razorpayOrderId });
+ 
+//       if (order) {
+//         // Idempotent: only touch the DB if it isn't already marked paid,
+//         // since Razorpay can and will send the same event more than once.
+//         if (order.paymentStatus !== "paid") {
+//           order.paymentStatus = "paid";
+//           order.razorpayPaymentId = payment.id;
+//           await order.save();
+//           console.log(` Webhook confirmed payment for order ${order._id}`);
+//         }
+//       } else {
+//         // The webhook arrived before /verify finished creating the order
+//         // (normal race condition — webhooks are often fast) or /verify
+//         // never ran at all (browser closed, network dropped, etc).
+//         // The cart-based order-creation logic lives in verifyPayment and
+//         // needs the customer's live cart, which isn't available here, so
+//         // we can't safely reconstruct the order from the webhook alone.
+//         // Flagging it for follow-up instead of silently dropping it:
+//         console.warn(
+//           ` Webhook received payment.captured for Razorpay order ${razorpayOrderId} ` +
+//           `but no matching Order exists yet. If /verify never runs, this needs manual reconciliation.`
+//         );
+//         // Optional: persist this to a "pendingReconciliation" collection,
+//         // or notify an admin (email/Slack) so it doesn't get lost.
+//       }
+//     }
+ 
+//     if (event.event === "payment.failed") {
+//       const payment = event.payload.payment.entity;
+//       const order = await Order.findOne({ razorpayOrderId: payment.order_id });
+//       if (order && order.paymentStatus !== "paid") {
+//         order.paymentStatus = "failed";
+//         await order.save();
+//       }
+//       console.log(` Webhook: payment failed for Razorpay order ${payment.order_id}`);
+//     }
+ 
+//     // Always respond 200 quickly so Razorpay doesn't retry unnecessarily.
+//     return res.status(200).json({ received: true });
+//   } catch (error) {
+//     console.error(" handleRazorpayWebhook error:", error);
+//     // Still return 200 here if the error is on our side after verifying
+//     // the signature, so Razorpay doesn't hammer retries for a bug that
+//     // won't fix itself. If you'd rather get retries, use 500 instead.
+//     return res.status(200).json({ received: true, note: "processed with errors" });
+//   }
+// };
+ 

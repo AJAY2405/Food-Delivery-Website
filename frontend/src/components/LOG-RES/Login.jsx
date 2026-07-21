@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getData } from "@/context/userContext";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, UtensilsCrossed } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -81,38 +81,49 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center px-4">
-      <Card className="w-full max-w-sm border border-orange-200 shadow-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-semibold text-center text-orange-900">
+    <div className="min-h-screen bg-[#FFF8F2] flex items-center justify-center px-4 py-10">
+      <Card className="w-full max-w-sm border border-orange-100 shadow-sm rounded-2xl">
+        <CardHeader className="space-y-3 pb-2">
+          {/* ── Brand mark, echoes the restaurant icon used on CustomerBrowse ── */}
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100">
+            <UtensilsCrossed className="h-6 w-6 text-orange-500" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-center text-gray-900">
             Welcome Back
           </CardTitle>
+          <p className="text-center text-sm text-gray-500">
+            Log in to keep ordering from your favorite restaurants
+          </p>
         </CardHeader>
 
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-2">
             {/* Email */}
             <div>
-              <Label htmlFor="email" className="text-sm font-medium">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email Address
               </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 focus-visible:ring-orange-400"
-              />
+              <div className="relative mt-1">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-orange-400" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="pl-9 rounded-xl h-10 border-gray-200 focus-visible:ring-orange-400"
+                />
+              </div>
             </div>
 
             {/* Password */}
             <div>
-              <Label htmlFor="password" className="text-sm font-medium">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
                 Password
               </Label>
               <div className="relative mt-1">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-orange-400" />
                 <Input
                   id="password"
                   name="password"
@@ -120,19 +131,19 @@ const Login = () => {
                   placeholder="Enter password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="pr-10 focus-visible:ring-orange-400"
+                  className="pl-9 pr-10 rounded-xl h-10 border-gray-200 focus-visible:ring-orange-400"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1 h-8 w-8"
+                  className="absolute right-1 top-1 h-8 w-8 rounded-lg cursor-pointer hover:bg-orange-100"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
+                    <EyeOff className="h-4 w-4 text-gray-500" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-4 w-4 text-gray-500" />
                   )}
                 </Button>
               </div>
@@ -143,7 +154,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => navigate("/forgot-password")}
-                className="text-sm font-medium text-orange-600 hover:text-orange-700"
+                className="text-sm font-medium text-orange-600 hover:text-orange-700 cursor-pointer"
               >
                 Forgot Password?
               </button>
@@ -155,7 +166,7 @@ const Login = () => {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl h-10 cursor-pointer disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -172,7 +183,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => navigate("/signup")}
-                className="ml-2 font-medium text-orange-600 hover:text-orange-700"
+                className="ml-2 font-medium text-orange-600 hover:text-orange-700 cursor-pointer"
               >
                 Sign Up
               </button>

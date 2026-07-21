@@ -46,14 +46,14 @@ export default function About() {
   return (
     <div className="bg-orange-50 min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-orange-300 to-orange-400 text-white">
+      <section className="bg-gradient-to-r from-orange-400 to-orange-400 text-white">
         <div className="max-w-7xl mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            About FoodExpress
+            About QuickBite
           </h1>
 
           <p className="max-w-3xl mx-auto text-lg text-orange-100 leading-8">
-            FoodExpress connects people with their favorite restaurants through
+            QuickBite connects people with their favorite restaurants through
             a fast, secure, and convenient food delivery platform. We believe
             that delicious food should always be just a few clicks away.
           </p>
@@ -75,7 +75,7 @@ export default function About() {
             <h2 className="text-4xl font-bold text-gray-800 mb-6">Our Story</h2>
 
             <p className="text-gray-600 leading-8 mb-6">
-              FoodExpress was created with one goal—to make food ordering
+              QuickBite was created with one goal—to make food ordering
               simple, quick, and enjoyable. Whether you're craving pizza,
               burgers, Indian cuisine, desserts, or healthy meals, our platform
               brings hundreds of restaurants together in one place.
