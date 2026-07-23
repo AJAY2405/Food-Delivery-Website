@@ -1,15 +1,8 @@
-// import dns from "node:dns";
-// import net from "node:net";                    // ← new import
-
-// dns.setDefaultResultOrder("ipv4first");
-// net.setDefaultAutoSelectFamily(false); 
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first");
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./utils/db.js";
-import userRoutes from "./routes/user_routes.js"; // ✅ Importing routes
+import userRoutes from "./routes/user_routes.js"; 
 import cartRoute from "./routes/cartRoutes.js";
 import restaurantRoute from "./routes/restaurantRoutes.js";
 import paymentRoutes from "./routes/payment_routes.js";
