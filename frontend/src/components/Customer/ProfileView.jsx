@@ -139,7 +139,7 @@ const ProfileView = () => {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-sm">
+        {/* <Card className="rounded-2xl shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <MapPin className="h-5 w-5 text-orange-500" />
@@ -158,7 +158,7 @@ const ProfileView = () => {
               Manage Addresses
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

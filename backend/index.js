@@ -16,6 +16,7 @@ import { backfillFoodRatings } from "./scripts/backfillFoodRatings.js";
 import { initSocket } from "./utils/socket.js";
 import riderRoutes from "./routes/riderRoutes.js";
 import { createServer } from "http";
+import { handleRazorpayWebhook } from "./controller/payment_controller.js";
 // import { handleRazorpayWebhook } from "./controller/payment_controller.js";
 
 
@@ -28,11 +29,11 @@ connectDB();
 
 backfillFoodRatings();
 
-// app.post(
-//   "/api/v1/payment/webhook",
-//   express.raw({ type: "application/json" }),
-//   handleRazorpayWebhook
-// );
+app.post(
+  "/api/v1/payment/webhook",
+  express.raw({ type: "application/json" }),
+  handleRazorpayWebhook
+);
 
 
 

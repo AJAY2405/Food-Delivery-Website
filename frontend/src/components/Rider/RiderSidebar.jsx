@@ -1,8 +1,9 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Package, Bike, History, User, X } from "lucide-react";
+import { Package, Bike, History, User, X, House } from "lucide-react";
 
 const links = [
+  { to: "/rider/available-orders", label: "Home", icon: House  },
   { to: "/rider/available-orders", label: "Available Orders", icon: Package },
   { to: "/rider/picked-orders", label: "My Deliveries", icon: Bike },
   { to: "/rider/history", label: "Delivery History", icon: History },

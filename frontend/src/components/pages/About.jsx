@@ -123,7 +123,7 @@ export default function About() {
       </section>
 
       {/* Statistics */}
-      <section className="py-20">
+      {/* <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -140,7 +140,7 @@ export default function About() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Mission */}
       <section className="bg-orange-400 text-white py-20">

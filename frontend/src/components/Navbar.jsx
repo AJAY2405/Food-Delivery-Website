@@ -119,6 +119,11 @@ const Navbar = () => {
       case "customer":
         return [
           {
+            to: "/",
+            label: "Home",
+            icon: <Home className="mr-2 h-4 w-4" />,
+          },
+          {
             to: "/profile",
             label: "My Profile",
             icon: <User className="mr-2 h-4 w-4" />,
@@ -137,6 +142,11 @@ const Navbar = () => {
 
       case "restaurant":
         return [
+          {
+            to: "/",
+            label: "Home",
+            icon: <Home className="mr-2 h-4 w-4" />,
+          },
           {
             to: "/restaurant/account",
             label: "Restaurant Profile",
@@ -161,6 +171,11 @@ const Navbar = () => {
 
       case "rider":
         return [
+          {
+            to: "/",
+            label: "Home",
+            icon: <Home className="mr-2 h-4 w-4" />,
+          },
           {
             to: "/rider",
             label: "Rider Dashboard",

@@ -46,11 +46,7 @@ const authHeaders = () => ({
   withCredentials: true,
 });
 
-/* ── Status config ──
-   Mirrors the `status` enum on the Order model exactly:
-   placed -> confirmed -> preparing -> ready_for_pickup
-          -> out_for_delivery (rider claims it) -> delivered
-   (or cancelled at any point before out_for_delivery). */
+
 const STATUS_CONFIG = {
   placed: {
     label: "Placed",
@@ -91,12 +87,6 @@ const STATUS_CONFIG = {
 
 const ALL_STATUSES = Object.keys(STATUS_CONFIG);
 
-/* Statuses a restaurant is actually allowed to set from the dropdown —
-   kept in lockstep with RESTAURANT_SETTABLE in restaurantController.js.
-   "placed" is handled by the Accept/Reject buttons, and
-   "out_for_delivery"/"delivered" are rider-owned (set via
-   riderController.pickOrder / markDelivered), so none of those belong
-   in this list even though they're valid statuses overall. */
 const RESTAURANT_SETTABLE_STATUSES = ["confirmed", "preparing", "ready_for_pickup", "cancelled"];
 
 /* ── Helpers ── */
@@ -142,10 +132,20 @@ const startOfMonth = () => {
   return d;
 };
 
-/* ── Open Google Maps directions from the visitor's current location to
-   a given delivery address. Leaving "origin" out of the URL lets Google
-   Maps default to "My Location" (it will prompt for location permission
-   if it hasn't been granted yet). ── */
+/* Returns the lower-bound Date for a given revenue range key,
+   or null for "all" (no lower bound). Shared by both the stat
+   cards and the order-list filtering so they always agree. */
+const getRangeStart = (range) => {
+  if (range === "today") {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  if (range === "week") return startOfWeek();
+  if (range === "month") return startOfMonth();
+  return null;
+};
+
 const openDirections = (address) => {
   if (!address) return;
   const destination = encodeURIComponent(address);
@@ -546,14 +546,26 @@ const RestaurantOrders = () => {
     }
   };
 
-  /* ── Filtered orders (status) ── */
-  const filteredOrders = useMemo(
-    () =>
-      statusFilter === "all"
-        ? orders
-        : orders.filter((o) => o.status === statusFilter),
-    [orders, statusFilter]
-  );
+  /* ── Filtered orders (status + revenue range) ──
+     Previously this only applied statusFilter, so switching the
+     Today/Week/Month/All time pills only changed the stat-card
+     numbers but left the day-by-day order list showing everything.
+     Now both filters are applied together so the list and the
+     cards always agree. */
+  const filteredOrders = useMemo(() => {
+    let result = orders;
+
+    if (statusFilter !== "all") {
+      result = result.filter((o) => o.status === statusFilter);
+    }
+
+    const rangeStart = getRangeStart(revenueRange);
+    if (rangeStart) {
+      result = result.filter((o) => new Date(o.createdAt) >= rangeStart);
+    }
+
+    return result;
+  }, [orders, statusFilter, revenueRange]);
 
   /* ── Group by day ── */
   const groupedByDay = useMemo(() => {
@@ -577,18 +589,18 @@ const RestaurantOrders = () => {
 
     const sum = (arr) => arr.reduce((acc, o) => acc + (o.total || 0), 0);
 
-    const now = new Date();
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    const todayStart = getRangeStart("today");
+    const weekStart = getRangeStart("week");
+    const monthStart = getRangeStart("month");
 
     const todayOrders = paidOrders.filter(
       (o) => new Date(o.createdAt) >= todayStart
     );
     const weekOrders = paidOrders.filter(
-      (o) => new Date(o.createdAt) >= startOfWeek()
+      (o) => new Date(o.createdAt) >= weekStart
     );
     const monthOrders = paidOrders.filter(
-      (o) => new Date(o.createdAt) >= startOfMonth()
+      (o) => new Date(o.createdAt) >= monthStart
     );
 
     return {
@@ -599,14 +611,23 @@ const RestaurantOrders = () => {
     };
   }, [orders]);
 
-  /* ── Status count badges for filter tabs ── */
+  /* ── Status count badges for filter tabs ──
+     Kept scoped to the selected revenue range (not statusFilter,
+     so the counts still show how many of each status exist within
+     that date window) — this way the badges stay consistent with
+     whatever range pill is active. */
   const statusCounts = useMemo(() => {
-    const counts = { all: orders.length };
+    const rangeStart = getRangeStart(revenueRange);
+    const scoped = rangeStart
+      ? orders.filter((o) => new Date(o.createdAt) >= rangeStart)
+      : orders;
+
+    const counts = { all: scoped.length };
     ALL_STATUSES.forEach((s) => {
-      counts[s] = orders.filter((o) => o.status === s).length;
+      counts[s] = scoped.filter((o) => o.status === s).length;
     });
     return counts;
-  }, [orders]);
+  }, [orders, revenueRange]);
 
   if (loading) {
     return (
@@ -677,24 +698,29 @@ const RestaurantOrders = () => {
             />
             <StatCard
               label="Delivered"
-              value={orders.filter((o) => o.status === "delivered").length}
+              value={
+                filteredOrders.filter((o) => o.status === "delivered").length
+              }
               sub="completed orders"
               icon={<PackageCheck className="h-4 w-4 text-green-500" />}
               accent="bg-green-100"
             />
             <StatCard
               label="In Progress"
-              value={orders.filter(
-                (o) =>
+              value={
+                filteredOrders.filter((o) =>
                   ["placed", "confirmed", "preparing", "ready_for_pickup", "out_for_delivery"].includes(o.status)
-              ).length}
+                ).length
+              }
               sub="active orders"
               icon={<Clock className="h-4 w-4 text-yellow-500" />}
               accent="bg-yellow-100"
             />
             <StatCard
               label="Cancelled"
-              value={orders.filter((o) => o.status === "cancelled").length}
+              value={
+                filteredOrders.filter((o) => o.status === "cancelled").length
+              }
               sub="of all orders"
               icon={<XCircle className="h-4 w-4 text-red-400" />}
               accent="bg-red-50"
