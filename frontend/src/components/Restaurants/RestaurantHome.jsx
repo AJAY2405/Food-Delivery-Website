@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -108,12 +107,12 @@ const RestaurantHome = () => {
               <div className="flex items-center gap-2 mt-1">
                 <Badge
                   className={
-                    savedUser?.isOpen
+                    savedUser.isOpen
                       ? "bg-green-100 text-green-700 hover:bg-green-100"
                       : "bg-gray-200 text-gray-600 hover:bg-gray-200"
                   }
                 >
-                  {savedUser?.isOpen ? "Open" : "Closed"}
+                  {savedUser.isOpen ? "Open" : "Closed"}
                 </Badge>
                 {savedUser?.openingTime && savedUser?.closingTime && (
                   <span className="flex items-center gap-1 text-xs text-gray-500">
