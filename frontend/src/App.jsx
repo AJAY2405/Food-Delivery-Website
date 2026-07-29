@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
+import "./utils/axiosCartInterceptor";
 
 import MainLayout from "./components/layouts/MainLayout";
 import { SocketProvider } from "./context/socketContext";

@@ -65,8 +65,8 @@ import handlebars from "handlebars";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log(process.env.MAIL_HOST);
-console.log(process.env.MAIL_PORT);
+// console.log(process.env.MAIL_HOST);
+// console.log(process.env.MAIL_PORT);
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: process.env.MAIL_PORT,

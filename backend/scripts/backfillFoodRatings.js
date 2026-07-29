@@ -13,11 +13,11 @@ export const backfillFoodRatings = async () => {
         rating: Math.round(s.avg * 10) / 10,
         numRatings: s.count,
       });
-      console.log(`Updated food ${s._id}: rating=${s.avg}, count=${s.count}`);
+      // console.log(`Updated food ${s._id}: rating=${s.avg}, count=${s.count}`);
     }
 
-    console.log(`✅ Backfill complete — ${stats.length} food item(s) updated`);
+    // console.log(`✅ Backfill complete — ${stats.length} food item(s) updated`);
   } catch (err) {
-    console.error("❌ Backfill error:", err.message);
+    console.error("Backfill error:", err.message);
   }
 };

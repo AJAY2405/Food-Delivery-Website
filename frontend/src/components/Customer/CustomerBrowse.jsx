@@ -1,5 +1,3 @@
-
-
 // import React, { useEffect, useState, useMemo } from "react";
 // import axios from "axios";
 // import { useLocation, useNavigate } from "react-router-dom";
@@ -64,9 +62,6 @@
 // };
 
 // // Normalize a food item's veg/non-veg status into 'veg' | 'non-veg' | null.
-// // Supports a boolean `isVeg`/`veg` field, or a string field like
-// // `foodType`/`type`/`category` containing "veg"/"vegetarian"/"non-veg" etc.
-// // Adjust this if your schema uses a different field name.
 // const getFoodType = (food) => {
 //   if (typeof food.isVeg === "boolean") return food.isVeg ? "veg" : "non-veg";
 //   if (typeof food.veg === "boolean") return food.veg ? "veg" : "non-veg";
@@ -105,7 +100,7 @@
 
 // const matchesDistanceRange = (dist, range) => {
 //   if (range === "all") return true;
-//   if (dist == null) return false; 
+//   if (dist == null) return false;
 //   switch (range) {
 //     case "lt1":
 //       return dist < 1;
@@ -387,9 +382,9 @@
 //         const replace = window.confirm(error.response.data.message);
 
 //         if (!replace) {
-//   toast.info("Cart replacement cancelled.");
-//   return;
-// }
+//           toast.info("Cart replacement cancelled.");
+//           return;
+//         }
 
 //         try {
 //           const token = localStorage.getItem("accessToken");
@@ -453,7 +448,7 @@
 //               <button
 //                 key={cat.name}
 //                 onClick={() => handleCategoryClick(cat.name)}
-//                 className="flex flex-col items-center gap-2 shrink-0"
+//                 className="flex flex-col items-center gap-2 shrink-0 cursor-pointer"
 //               >
 //                 <div
 //                   className={`h-16 w-16 rounded-full overflow-hidden border-2 transition ${
@@ -495,7 +490,7 @@
 //           {restaurantFilter && (
 //             <button
 //               onClick={clearRestaurantFilter}
-//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl"
+//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl cursor-pointer"
 //             >
 //               {restaurantFilterName || "Filtered"}
 //               <X className="h-3.5 w-3.5" />
@@ -505,7 +500,7 @@
 //           {distanceRange !== "all" && (
 //             <button
 //               onClick={() => setDistanceRange("all")}
-//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl"
+//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl cursor-pointer"
 //             >
 //               {DISTANCE_RANGES.find((r) => r.value === distanceRange)?.label}
 //               <X className="h-3.5 w-3.5" />
@@ -515,7 +510,7 @@
 //           {selectedCategory && (
 //             <button
 //               onClick={() => setSelectedCategory(null)}
-//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl"
+//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl cursor-pointer"
 //             >
 //               {selectedCategory}
 //               <X className="h-3.5 w-3.5" />
@@ -525,7 +520,7 @@
 //           {vegFilter !== "all" && (
 //             <button
 //               onClick={() => setVegFilter("all")}
-//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl"
+//               className="flex items-center gap-1.5 text-sm font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors px-3 py-2 rounded-xl cursor-pointer"
 //             >
 //               {vegFilter === "veg" ? "Veg only" : "Non-veg only"}
 //               <X className="h-3.5 w-3.5" />
@@ -537,7 +532,7 @@
 //         {/* Kept to a single row on every screen size: it scrolls
 //             horizontally on narrow (phone) viewports and fits without
 //             wrapping on wide (laptop/desktop) ones. */}
-//         <div className="flex flex-nowrap items-center gap-3 bg-orange-50    mb-8 overflow-x-auto scrollbar-hide">
+//         <div className="flex flex-nowrap items-center gap-3 bg-orange-50 p-3 rounded-2xl border border-orange-100 mb-8 overflow-x-auto scrollbar-hide">
 //           <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
 //             <UtensilsCrossed className="h-4 w-4 text-orange-500 flex-shrink-0" />
 //             <Select
@@ -554,13 +549,19 @@
 //                 );
 //               }}
 //             >
-//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
+//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200 bg-white cursor-pointer">
 //                 <SelectValue placeholder="All restaurants" />
 //               </SelectTrigger>
 //               <SelectContent>
-//                 <SelectItem value="all">All Restaurants</SelectItem>
+//                 <SelectItem value="all" className="cursor-pointer">
+//                   All Restaurants
+//                 </SelectItem>
 //                 {groups.map(({ restaurant }) => (
-//                   <SelectItem key={restaurant._id} value={restaurant._id}>
+//                   <SelectItem
+//                     key={restaurant._id}
+//                     value={restaurant._id}
+//                     className="cursor-pointer"
+//                   >
 //                     {restaurant.restaurantName || restaurant.username}
 //                   </SelectItem>
 //                 ))}
@@ -571,13 +572,19 @@
 //           <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
 //             <ArrowUpDown className="h-4 w-4 text-orange-500 flex-shrink-0" />
 //             <Select value={restaurantSort} onValueChange={handleRestaurantSortChange}>
-//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
+//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200 bg-white cursor-pointer">
 //                 <SelectValue placeholder="Sort restaurants" />
 //               </SelectTrigger>
 //               <SelectContent>
-//                 <SelectItem value="name_asc">Restaurant name (A-Z)</SelectItem>
-//                 <SelectItem value="name_desc">Restaurant name (Z-A)</SelectItem>
-//                 <SelectItem value="distance">Nearest to me</SelectItem>
+//                 <SelectItem value="name_asc" className="cursor-pointer">
+//                   Restaurant (A-Z)
+//                 </SelectItem>
+//                 <SelectItem value="name_desc" className="cursor-pointer">
+//                   Restaurant (Z-A)
+//                 </SelectItem>
+//                 <SelectItem value="distance" className="cursor-pointer">
+//                   Nearest to me
+//                 </SelectItem>
 //               </SelectContent>
 //             </Select>
 //           </div>
@@ -585,14 +592,22 @@
 //           <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
 //             <IndianRupee className="h-4 w-4 text-orange-500 flex-shrink-0" />
 //             <Select value={priceSort} onValueChange={setPriceSort}>
-//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
+//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200 bg-white cursor-pointer">
 //                 <SelectValue placeholder="Sort items" />
 //               </SelectTrigger>
 //               <SelectContent>
-//                 <SelectItem value="default">Default item order</SelectItem>
-//                 <SelectItem value="low_high">Price: Low to High</SelectItem>
-//                 <SelectItem value="high_low">Price: High to Low</SelectItem>
-//                 <SelectItem value="rating_high">Rating: High to Low</SelectItem>
+//                 <SelectItem value="default" className="cursor-pointer">
+//                   Default item 
+//                 </SelectItem>
+//                 <SelectItem value="low_high" className="cursor-pointer">
+//                   Price: Low to High
+//                 </SelectItem>
+//                 <SelectItem value="high_low" className="cursor-pointer">
+//                   Price: High to Low
+//                 </SelectItem>
+//                 <SelectItem value="rating_high" className="cursor-pointer">
+//                   Rating: High to Low
+//                 </SelectItem>
 //               </SelectContent>
 //             </Select>
 //           </div>
@@ -601,12 +616,12 @@
 //           <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
 //             <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
 //             <Select value={distanceRange} onValueChange={handleDistanceRangeChange}>
-//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
+//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200 bg-white cursor-pointer">
 //                 <SelectValue placeholder="Distance" />
 //               </SelectTrigger>
 //               <SelectContent>
 //                 {DISTANCE_RANGES.map((r) => (
-//                   <SelectItem key={r.value} value={r.value}>
+//                   <SelectItem key={r.value} value={r.value} className="cursor-pointer">
 //                     {r.label}
 //                   </SelectItem>
 //                 ))}
@@ -618,13 +633,19 @@
 //           <div className="flex items-center gap-2 w-[170px] sm:w-[190px] shrink-0">
 //             <Leaf className="h-4 w-4 text-orange-500 flex-shrink-0" />
 //             <Select value={vegFilter} onValueChange={setVegFilter}>
-//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200">
+//               <SelectTrigger className="h-9 text-sm rounded-xl border-gray-200 bg-white cursor-pointer">
 //                 <SelectValue placeholder="Veg / Non-veg" />
 //               </SelectTrigger>
 //               <SelectContent>
-//                 <SelectItem value="all">All items</SelectItem>
-//                 <SelectItem value="veg">Veg only</SelectItem>
-//                 <SelectItem value="non-veg">Non-veg only</SelectItem>
+//                 <SelectItem value="all" className="cursor-pointer">
+//                   All items
+//                 </SelectItem>
+//                 <SelectItem value="veg" className="cursor-pointer">
+//                   Veg only
+//                 </SelectItem>
+//                 <SelectItem value="non-veg" className="cursor-pointer">
+//                   Non-veg only
+//                 </SelectItem>
 //               </SelectContent>
 //             </Select>
 //           </div>
@@ -639,7 +660,7 @@
 //           {(restaurantSort === "distance" || distanceRange !== "all") && !locating && (
 //             <button
 //               onClick={handleSortByDistance}
-//               className="flex items-center gap-1 text-xs text-orange-600 font-medium hover:text-orange-700 shrink-0 whitespace-nowrap sm:ml-auto"
+//               className="flex items-center gap-1 text-xs text-orange-600 font-medium hover:text-orange-700 shrink-0 whitespace-nowrap sm:ml-auto cursor-pointer"
 //             >
 //               <LocateFixed className="h-3.5 w-3.5" />
 //               Refresh location
@@ -738,12 +759,14 @@
 
 
 
+
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -763,6 +786,7 @@ import {
   Navigation,
   UtensilsCrossed,
   Leaf,
+  ChevronDown,
 } from "lucide-react";
 import FoodCard from "./FoodCard";
 
@@ -887,6 +911,28 @@ const CustomerBrowse = () => {
   // ── Veg / Non-veg filter ──
   const [vegFilter, setVegFilter] = useState("all"); // all | veg | non-veg
 
+  // ── "Show 6, load 6 more" pagination, tracked per restaurant ──
+  const ITEMS_PER_PAGE = 3;
+  const [visibleCounts, setVisibleCounts] = useState({}); // { [restaurantId]: number }
+  const [loadingMoreId, setLoadingMoreId] = useState(null); // restaurantId currently loading more
+
+  const getVisibleCount = (restaurantId) =>
+    visibleCounts[restaurantId] ?? ITEMS_PER_PAGE;
+
+  const handleLoadMore = (restaurantId) => {
+    setLoadingMoreId(restaurantId);
+    // Small delay so the loading state is actually visible — the data's
+    // already in memory, this just paces the reveal instead of an
+    // instant jump-cut.
+    setTimeout(() => {
+      setVisibleCounts((prev) => ({
+        ...prev,
+        [restaurantId]: getVisibleCount(restaurantId) + ITEMS_PER_PAGE,
+      }));
+      setLoadingMoreId(null);
+    }, 500);
+  };
+
   // ── Clear the navigation state so a back-navigation doesn't re-apply it ──
   useEffect(() => {
     if (location.state?.restaurantId) {
@@ -915,14 +961,15 @@ const CustomerBrowse = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    setVisibleCounts({});
+  }, [search, selectedCategory, vegFilter, restaurantFilter, distanceRange]);
+
   const clearRestaurantFilter = () => {
     setRestaurantFilter(null);
     setRestaurantFilterName("");
   };
 
-  /* ── Get the customer's live location, then geocode each restaurant's
-     saved address (or use lat/lng if the backend already provides them)
-     to compute straight-line distance ── */
   const handleSortByDistance = () => {
     if (!navigator.geolocation) {
       toast.error("Location access isn't supported in this browser");
@@ -1421,6 +1468,11 @@ const CustomerBrowse = () => {
           <div className="space-y-10">
             {sortedGroups.map(({ restaurant, foods }) => {
               const dist = distances[restaurant._id];
+              const visibleCount = getVisibleCount(restaurant._id);
+              const visibleFoods = foods.slice(0, visibleCount);
+              const hasMore = foods.length > visibleCount;
+              const isLoadingMore = loadingMoreId === restaurant._id;
+
               return (
                 <section key={restaurant._id}>
                   <div className="flex items-center gap-3 mb-4">
@@ -1471,18 +1523,44 @@ const CustomerBrowse = () => {
                       No items listed yet.
                     </p>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {foods.map((food) => (
-                        <FoodCard
-                          key={food._id}
-                          food={{
-                            ...food,
-                            restaurant,
-                          }}
-                          onAddToCart={handleAddToCart}
-                        />
-                      ))}
-                    </div>
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {visibleFoods.map((food) => (
+                          <FoodCard
+                            key={food._id}
+                            food={{
+                              ...food,
+                              restaurant,
+                            }}
+                            onAddToCart={handleAddToCart}
+                          />
+                        ))}
+                      </div>
+
+                      {/* ── Load 6 more ── */}
+                      {hasMore && (
+                        <div className="flex justify-center mt-5">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleLoadMore(restaurant._id)}
+                            disabled={isLoadingMore}
+                            className="rounded-xl border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                          >
+                            {isLoadingMore ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Loading…
+                              </>
+                            ) : (
+                              <>
+                                 more items
+                                
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </section>
               );

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 
+
 const authHeaders = () => ({
   headers: {
     "Content-Type": "application/json",
@@ -165,8 +166,13 @@ const FloatingCartButton = () => {
         touchAction: "none",
         zIndex: 60,
       }}
-      className="rounded-full bg-gradient-to-r from-orange-500 to-amber-500 shadow-lg shadow-orange-500/30 flex items-center justify-center active:scale-95 transition-transform cursor-grab active:cursor-grabbing select-none"
-    >
+className="rounded-full bg-gradient-to-r from-orange-600 to-amber-500
+animate-glow
+flex items-center justify-center
+active:scale-95
+transition-all duration-300
+cursor-grab active:cursor-grabbing
+select-none"    >
       <ShoppingCart className="h-6 w-6 text-white" />
       <span
         className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-white text-orange-600 text-xs font-bold flex items-center justify-center border-2 border-orange-500"
