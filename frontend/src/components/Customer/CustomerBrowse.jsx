@@ -1228,7 +1228,7 @@ const CustomerBrowse = () => {
         </p>
 
         {/* ── Category filter (image based) ── */}
-        <div className="flex gap-5 overflow-x-auto pb-3 mb-5 scrollbar-hide">
+        {/* <div className="flex gap-5 overflow-x-auto pb-3 mb-5 scrollbar-hide">
           {CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat.name;
             return (
@@ -1260,7 +1260,27 @@ const CustomerBrowse = () => {
               </button>
             );
           })}
-        </div>
+        </div> */}
+        <div className="flex items-center gap-4 sm:gap-5 overflow-x-auto pb-2 pt-1 no-scrollbar -mx-1 px-1">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => handleCategoryClick(cat.name)}
+                className="group flex shrink-0 cursor-pointer flex-col items-center gap-2 focus:outline-none"
+              >
+                <div className="h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-full border-2 border-stone-100 p-0.5 shadow-sm transition-transform duration-200 group-hover:scale-105 group-hover:border-orange-500">
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-stone-600 group-hover:text-orange-600 whitespace-nowrap">
+                  {cat.name}
+                </span>
+              </button>
+            ))}
+          </div>
 
         {/* ── Search ── */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
