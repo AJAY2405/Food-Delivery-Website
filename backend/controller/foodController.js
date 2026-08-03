@@ -237,11 +237,6 @@ export const getFoodsByRestaurant = async (req, res) => {
     });
   }
 };
-
-/**
- * Get ALL food items across ALL restaurants, grouped/sorted by restaurant name
- * (used on the customer browse page)
- */
 export const getAllFoodsGroupedByRestaurant = async (req, res) => {
   try {
     const restaurants = await User.find({ role: "restaurant" })
@@ -301,6 +296,92 @@ export const getAllFoods = async (req, res) => {
     return res.status(200).json({
       success: true,
       totalFoods: foods.length,
+      foods,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+
+
+// ── Add these two exports to foodController.js ──
+
+/**
+ * Get a single food item by id (public, customer-facing detail page)
+ */
+export const getFoodById = async (req, res) => {
+  try {
+    const { foodId } = req.params;
+
+    const food = await Food.findById(foodId).populate(
+      "restaurant",
+      "restaurantName username photoUrl avatar cuisine isOpen openingTime closingTime address latitude longitude"
+    );
+
+    if (!food) {
+      return res.status(404).json({
+        success: false,
+        message: "Food item not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      food,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+export const getSimilarFoods = async (req, res) => {
+  try {
+    const { foodId } = req.params;
+
+    const food = await Food.findById(foodId);
+    if (!food) {
+      return res.status(404).json({
+        success: false,
+        message: "Food item not found",
+      });
+    }
+
+    
+    const STOP_WORDS = new Set([
+      "and", "with", "the", "of", "in", "special", "a", "an",
+    ]);
+    const words = food.name
+      .split(/\s+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 2 && !STOP_WORDS.has(w.toLowerCase()));
+
+    // Fallback for very short names (e.g. "Dosa") — just use the whole name.
+    const searchWords = words.length > 0 ? words : [food.name];
+    const regexes = searchWords.map(
+      (w) => new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")
+    );
+
+    const foods = await Food.find({
+      _id: { $ne: food._id },
+      name: { $in: regexes },
+    })
+      .populate(
+        "restaurant",
+        "restaurantName username photoUrl avatar cuisine isOpen openingTime closingTime address latitude longitude"
+      )
+      .limit(8);
+
+    return res.status(200).json({
+      success: true,
       foods,
     });
   } catch (error) {

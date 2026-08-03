@@ -13,6 +13,8 @@ import {
   getFoodsByRestaurant,
   getAllFoodsGroupedByRestaurant,
   getAllFoods,
+  getSimilarFoods,
+  getFoodById,
 } from "../controller/foodController.js";
 import { isAuthenticated } from "../middlewires/isAuthenticated.js";
 import { singleUpload } from "../middlewires/multer.js";
@@ -44,5 +46,8 @@ router.get("/food/all-grouped", getAllFoodsGroupedByRestaurant);
 router.get("/food/all", getAllFoods);
 // router.get("/food/:foodId", isAuthenticated, getFoodById);
 
+
+router.get("/food/:foodId/similar", getSimilarFoods);
+router.get("/food/:foodId", getFoodById);
 
 export default router;

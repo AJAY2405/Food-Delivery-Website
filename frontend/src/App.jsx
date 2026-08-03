@@ -52,6 +52,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import { useEffect, useState } from "react";
 import RestaurantProfilePage from "./components/Restaurants/RestaurantProfilepage";
+import FoodDetailPage from "./components/Customer/FoodDetailPage";
 
 const router = createBrowserRouter([
   // Public Routes
@@ -87,6 +88,7 @@ const router = createBrowserRouter([
 
         { path: "/customer/browse", element: <CustomerBrowse /> },
         { path: "/cart", element: <CustomerCart /> },
+        { path: "/food/:id", element: <FoodDetailPage /> },
         { path: "/order_history", element: <OrderHistory /> },
         { path: "/order/:orderId/track", element: <TrackRider /> },
       ],
