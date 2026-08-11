@@ -6,7 +6,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-orange-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-orange-400 to-orange-400 text-white">
+      <section className="bg-gradient-to-r from-orange-500 to-orange-500 text-white">
         <div className="max-w-7xl mx-auto px-6 py-24 text-center">
           <h1 className="text-5xl font-bold mb-4">Contact Us</h1>
 
@@ -178,7 +178,7 @@ const Contact = () => {
       </section>
 
       {/* Bottom CTA */}
-      <section className="bg-orange-400 py-16 text-white">
+      <section className="bg-orange-500 py-16 text-white">
         <div className="max-w-4xl mx-auto text-center px-6">
           <h2 className="text-4xl font-bold mb-4">
             We Are Here to Help 

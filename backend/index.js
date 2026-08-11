@@ -46,6 +46,7 @@ app.use(
       "http://localhost:5173",
       "https://food-delivery-website-gules.vercel.app",
       "http://139.84.173.140",
+      "http://139.84.173.140:5173"
     ],
     credentials: true,
   })

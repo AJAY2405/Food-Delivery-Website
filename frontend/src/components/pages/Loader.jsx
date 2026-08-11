@@ -22,7 +22,7 @@ const Loader = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
+    <div className="fixed inset-0 bg-[#FFF8F2] flex flex-col items-center justify-center z-50">
       {/* Restaurant Logo */}
       <img
         src={Logo}
