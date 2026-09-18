@@ -44,7 +44,7 @@ export const isAuthenticated = async(req, res, next) =>{
             let user;
 
             if (role === 'restaurant') {
-                user = await Restaurant.findById(id);
+                user = await User.findById(id);
             } else {
                 user = await User.findById(id);
             }

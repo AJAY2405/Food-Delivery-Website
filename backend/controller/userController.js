@@ -10,7 +10,9 @@ import cloudinary from "../utils/cloudinary.js";
 import crypto from "crypto"; 
 
 
-
+/**
+ * Register User
+ */
 export const registerUser = async (req, res) => {
   try {
     const { username, email, phone, password, role, vehicleType, vehicleNumber } = req.body;
@@ -90,7 +92,9 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
+/**
+ * Verify Email
+ */
 export const verification = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -255,7 +259,7 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    //  replaced block starts here
+    // 👇 replaced block starts here
     const sessionId = crypto.randomUUID();
 
     await Session.deleteMany({ userId: user._id }); // kills any other active session
@@ -272,7 +276,7 @@ export const loginUser = async (req, res) => {
       process.env.SECRET_KEY,
       { expiresIn: "30d" }
     );
-    //  replaced block ends here
+    // 👆 replaced block ends here
 
     user.isLoggedIn = true;
     await user.save();
@@ -306,7 +310,9 @@ export const loginUser = async (req, res) => {
 
 
 
-
+/*
+Logout User
+ */
 export const logoutUser = async (req, res) => {
   try {
     const userId = req.userId;
@@ -324,9 +330,9 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-
-
-
+/*
+ * Forgot Password - Send OTP
+ */
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -359,9 +365,9 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-
-
-
+/**
+ * Verify OTP
+ */
 export const verifyOTP = async (req, res) => {
   const { otp } = req.body;
   const email = req.params.email;
@@ -419,10 +425,9 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
-
-
-
-
+/**
+ * Change Password
+ */
 export const changePassword = async (req, res) => {
   const { newPassword, confirmPassword } = req.body;
   const email = req.params.email;
