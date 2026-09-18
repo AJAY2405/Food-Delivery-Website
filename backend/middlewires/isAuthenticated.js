@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user_model.js';
 import Restaurant from '../models/Restaurant.js';
+import { Session } from '../models/sessionModel.js'; // add this import
 
 export const isAuthenticated = async(req, res, next) =>{
     try {
-        // console.log("Middleware Started");
         const authHeader = req.headers.authorization;
-        // console.log("Headers:", req.headers);
 
         if(!authHeader || !authHeader.startsWith('Bearer')){
             return res.status(401).json({
@@ -31,7 +30,17 @@ export const isAuthenticated = async(req, res, next) =>{
                 })
             }
 
-            const { id, role } = decoded;
+            const { id, role, sessionId } = decoded;
+
+            // NEW: reject tokens from a session that's been replaced by a newer login
+            const session = await Session.findOne({ userId: id, sessionId });
+            if (!session) {
+                return res.status(401).json({
+                    success: false,
+                    message: "You've been logged out because this account was signed in elsewhere."
+                })
+            }
+
             let user;
 
             if (role === 'restaurant') {
@@ -59,5 +68,3 @@ export const isAuthenticated = async(req, res, next) =>{
         })
     }
 }
-
-

@@ -120,9 +120,9 @@ export const getRestaurantProfile = async (req, res) => {
   }
 };
 
-/**
- * Get all restaurants (for browsing / sorting on the customer side)
- */
+
+  // Get all restaurants (for browsing / sorting on the customer side)
+
 export const getAllRestaurants = async (req, res) => {
   try {
     const restaurants = await User.find({ role: "restaurant" })

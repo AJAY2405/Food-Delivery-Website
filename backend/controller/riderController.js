@@ -4,8 +4,8 @@ import { Rider } from "../models/rider_model.js";
 import { User } from "../models/user_model.js";
 import { getIO } from "../utils/socket.js";
 
-/* Small helper — every rider action needs their Rider profile doc,
-   so just-in-time create it the first time it's touched. */
+// Small helper — every rider action needs their Rider profile doc,
+//    so just-in-time create it the first time it's touched. 
 const getOrCreateRiderDoc = async (userId) => {
   let rider = await Rider.findOne({ userId });
   if (!rider) {
@@ -14,11 +14,11 @@ const getOrCreateRiderDoc = async (userId) => {
   return rider;
 };
 
-/**
- * Rider flips themself online/offline. Only "available" riders show up
- * as eligible to receive orders (available-orders is a shared feed
- * either way, but this gates whether they've opted in for the day).
- */
+
+  // Rider flips themself online/offline. Only "available" riders show up
+  // as eligible to receive orders (available-orders is a shared feed
+  // either way, but this gates whether they've opted in for the day).
+ 
 export const toggleAvailability = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -39,11 +39,11 @@ export const toggleAvailability = async (req, res) => {
   }
 };
 
-/**
- * Orders the restaurant has packed and left at the counter, not yet
- * claimed by anyone. This is the feed every online rider polls / listens
- * to over sockets.
- */
+
+  // Orders the restaurant has packed and left at the counter, not yet
+  // claimed by anyone. This is the feed every online rider polls / listens
+  // to over sockets.
+
 export const getAvailableOrders = async (req, res) => {
   try {
     const orders = await Order.find({ status: "ready_for_pickup", rider: null })
@@ -58,13 +58,13 @@ export const getAvailableOrders = async (req, res) => {
   }
 };
 
-/**
- * Claim an order. This is the one place that has to be race-safe:
- * two riders can tap "Pick up" on the same order within milliseconds
- * of each other. findOneAndUpdate with `rider: null` in the filter is
- * atomic at the DB level — only the first request to reach Mongo wins,
- * the second gets back null and a clean "already picked" response.
- */
+
+  // Claim an order. This is the one place that has to be race-safe:
+  // two riders can tap "Pick up" on the same order within milliseconds
+  // of each other. findOneAndUpdate with `rider: null` in the filter is
+  // atomic at the DB level — only the first request to reach Mongo wins,
+  // the second gets back null and a clean "already picked" response.
+
 export const pickOrder = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -110,7 +110,7 @@ export const pickOrder = async (req, res) => {
   }
 };
 
-/** Orders this rider currently has out for delivery. */
+//  Orders this rider currently has out for delivery. 
 export const getActiveOrders = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -127,7 +127,7 @@ export const getActiveOrders = async (req, res) => {
   }
 };
 
-/** Full detail for one order — used by the rider's OrderDetails screen. */
+//  Full detail for one order — used by the rider's OrderDetails screen. 
 export const getOrderDetails = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -151,7 +151,7 @@ export const getOrderDetails = async (req, res) => {
   }
 };
 
-/** Rider marks an order as handed to the customer. */
+//  Rider marks an order as handed to the customer. 
 export const markDelivered = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -191,13 +191,13 @@ export const markDelivered = async (req, res) => {
   }
 };
 
-/**
- * REST fallback for pushing a location update (the primary path is the
- * "rider:location" socket event in utils/socket.js — this exists for
- * clients that poll instead of holding a socket open, and to persist
- * the latest point so a customer who loads the page mid-delivery still
- * sees a starting position before the next socket tick arrives).
- */
+
+  // REST fallback for pushing a location update (the primary path is the
+  // "rider:location" socket event in utils/socket.js — this exists for
+  // clients that poll instead of holding a socket open, and to persist
+  // the latest point so a customer who loads the page mid-delivery still
+  // sees a starting position before the next socket tick arrives).
+ 
 export const updateLocation = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -230,7 +230,7 @@ export const updateLocation = async (req, res) => {
   }
 };
 
-/** Delivered orders for this rider, most recent first. */
+//  Delivered orders for this rider, most recent first. 
 export const getDeliveryHistory = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -247,7 +247,7 @@ export const getDeliveryHistory = async (req, res) => {
   }
 };
 
-/** Combined User + Rider profile info. */
+//  Combined User + Rider profile info. 
 export const getRiderProfile = async (req, res) => {
   try {
     const riderId = req.userId;
@@ -266,7 +266,7 @@ export const getRiderProfile = async (req, res) => {
   }
 };
 
-/** Update vehicle info / avatar. */
+//  Update vehicle info / avatar. 
 export const updateRiderProfile = async (req, res) => {
   try {
     const riderId = req.userId;

@@ -7,10 +7,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/dataUri.js";
 import cloudinary from "../utils/cloudinary.js";
+import crypto from "crypto"; 
 
-/**
- * Register User
- */
+
+
 export const registerUser = async (req, res) => {
   try {
     const { username, email, phone, password, role, vehicleType, vehicleNumber } = req.body;
@@ -90,9 +90,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-/**
- * Verify Email
- */
+
 export const verification = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -145,6 +143,82 @@ export const verification = async (req, res) => {
   }
 };
 
+// export const loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Email and Password are required",
+//       });
+//     }
+
+//     const user = await User.findOne({ email });
+
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+
+//     if (!isMatch) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid Password",
+//       });
+//     }
+
+//     if (!user.isVerified) {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Please verify your email first",
+//       });
+//     }
+
+//     await Session.deleteMany({ userId: user._id });
+
+//     await Session.create({
+//       userId: user._id,
+//     });
+
+//     const accessToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+//       expiresIn: "10d",
+//     });
+
+//     const refreshToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+//       expiresIn: "30d",
+//     });
+
+//     user.isLoggedIn = true;
+//     await user.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Welcome ${user.username}`,
+//       accessToken,
+//       refreshToken,
+//       user: {
+//         id: user._id,
+//         username: user.username,
+//         email: user.email,
+//         phone: user.phone,
+//         role: user.role,
+//         avatar: user.avatar,
+//         photoUrl: user.photoUrl,
+//         isVerified: user.isVerified,
+//       },
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -181,19 +255,24 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    await Session.deleteMany({ userId: user._id });
+    //  replaced block starts here
+    const sessionId = crypto.randomUUID();
 
-    await Session.create({
-      userId: user._id,
-    });
+    await Session.deleteMany({ userId: user._id }); // kills any other active session
+    await Session.create({ userId: user._id, sessionId });
 
-    const accessToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "10d",
-    });
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role, sessionId },
+      process.env.SECRET_KEY,
+      { expiresIn: "10d" }
+    );
 
-    const refreshToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "30d",
-    });
+    const refreshToken = jwt.sign(
+      { id: user._id, role: user.role, sessionId },
+      process.env.SECRET_KEY,
+      { expiresIn: "30d" }
+    );
+    //  replaced block ends here
 
     user.isLoggedIn = true;
     await user.save();
@@ -222,9 +301,12 @@ export const loginUser = async (req, res) => {
   }
 };
 
-/*
-Logout User
- */
+
+
+
+
+
+
 export const logoutUser = async (req, res) => {
   try {
     const userId = req.userId;
@@ -242,9 +324,9 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-/*
- * Forgot Password - Send OTP
- */
+
+
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -277,9 +359,9 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-/**
- * Verify OTP
- */
+
+
+
 export const verifyOTP = async (req, res) => {
   const { otp } = req.body;
   const email = req.params.email;
@@ -337,9 +419,10 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
-/**
- * Change Password
- */
+
+
+
+
 export const changePassword = async (req, res) => {
   const { newPassword, confirmPassword } = req.body;
   const email = req.params.email;

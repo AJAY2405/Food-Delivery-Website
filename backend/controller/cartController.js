@@ -44,9 +44,10 @@ const buildCartResponse = async (cart) => {
   };
 };
 
-/**
- * Get the logged-in customer's cart
- */
+
+
+
+
 export const getCart = async (req, res) => {
   try {
     const customerId = req.userId;
@@ -66,8 +67,9 @@ export const getCart = async (req, res) => {
   }
 };
 
-/*
- */
+
+
+
 export const addToCart = async (req, res) => {
   try {
     const customerId = req.userId;
@@ -156,9 +158,10 @@ export const addToCart = async (req, res) => {
   }
 };
 
-/**
- * Update quantity of a specific cart item (set to an exact number)
- */
+
+
+
+
 export const updateCartItem = async (req, res) => {
   try {
     const customerId = req.userId;
@@ -206,9 +209,9 @@ export const updateCartItem = async (req, res) => {
   }
 };
 
-/**
- * Remove a single item from the cart
- */
+
+  // Remove a single item from the cart
+ 
 export const removeCartItem = async (req, res) => {
   try {
     const customerId = req.userId;
@@ -253,9 +256,9 @@ export const removeCartItem = async (req, res) => {
   }
 };
 
-/**
- * Clear the entire cart
- */
+
+  // Clear the entire cart
+
 export const clearCart = async (req, res) => {
   try {
     const customerId = req.userId;

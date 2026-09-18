@@ -45,12 +45,22 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://food-delivery-website-gules.vercel.app",
-      "http://139.84.173.140",
+      // "http://139.84.173.140",
       "http://139.84.173.140:5173"
     ],
     credentials: true,
   })
 );
+
+
+// app.use(
+//   cors({
+//     origin:"http://139.84.173.140:5173",
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
 
 app.get("/", (req, res) => {
     res.send("CORS enabled backend running 🚀123");

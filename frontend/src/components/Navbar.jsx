@@ -1,17 +1,3 @@
-// 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -53,12 +39,12 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  /* ── Search handler ── */
+  //  ── Search handler 
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
 
-  /* ── Search submit — navigate to browse with the query ── */
+  // Search submit — navigate to browse with the query 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const trimmed = search.trim();
@@ -66,7 +52,7 @@ const Navbar = () => {
     navigate("/customer/browse", { state: { search: trimmed } });
   };
 
-  /* ── Logout ── */
+  // 
   const logoutHandler = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -88,7 +74,7 @@ const Navbar = () => {
     }
   };
 
-  /* ── Role-based dropdown items ── */
+  //  Role-based dropdown items 
   const getDropdownItems = () => {
     if (!user) return [];
 
@@ -182,7 +168,7 @@ const Navbar = () => {
 
   const dropdownItems = getDropdownItems();
 
-  /* ── Role badge color ── */
+  //  Role badge color 
   const roleBadgeColor = {
     restaurant:
       "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400",

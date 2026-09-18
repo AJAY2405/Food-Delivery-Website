@@ -32,7 +32,7 @@ const FitBounds = ({ points }) => {
   return null;
 };
 
-/** Smoothly re-centers on the rider as new location pings arrive. */
+//  Smoothly re-centers on the rider as new location pings arrive. 
 const FollowRider = ({ pos }) => {
   const map = useMap();
   const started = useRef(false);

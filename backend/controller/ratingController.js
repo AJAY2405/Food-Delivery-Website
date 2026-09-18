@@ -18,10 +18,10 @@ const recalculateFoodRating = async (foodId) => {
   });
 };
 
-/**
- * Customer rates (or edits their rating for) a food item —
- * only allowed once the order containing it is delivered.
- */
+
+//  Customer rates (or edits their rating for) a food item —
+//  only allowed once the order containing it is delivered.
+ 
 export const submitRating = async (req, res) => {
   try {
     const customerId = req.userId;
@@ -77,10 +77,10 @@ export const submitRating = async (req, res) => {
   }
 };
 
-/**
- * Get the logged-in customer's own ratings for a given order,
- * so the frontend can show "Rate" vs "Edit rating" per item.
- */
+
+  // Get the logged-in customer's own ratings for a given order,
+  // so the frontend can show "Rate" vs "Edit rating" per item.
+
 export const getRatingsForOrder = async (req, res) => {
   try {
     const customerId = req.userId;

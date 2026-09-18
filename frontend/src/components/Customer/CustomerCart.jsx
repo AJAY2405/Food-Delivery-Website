@@ -43,7 +43,7 @@ const authHeaders = () => ({
 
 const EMPTY_CART = { items: [], restaurant: null, subtotal: 0, totalItems: 0 };
 
-/* ── Load Razorpay script once ── */
+//  Load Razorpay script once 
 const loadRazorpayScript = () =>
   new Promise((resolve) => {
     if (document.getElementById("razorpay-script")) return resolve(true);
@@ -55,7 +55,7 @@ const loadRazorpayScript = () =>
     document.body.appendChild(script);
   });
 
-/* ── Delivery address card shown above the bill summary ── */
+//  Delivery address card shown above the bill summary
 const DeliveryAddressCard = ({ address, onSave, saved }) => {
   const [editing, setEditing] = useState(!address);
   const [draft, setDraft] = useState(address || "");
@@ -278,8 +278,8 @@ const CustomerCart = () => {
     }
 
     try {
-      /* 2. Create Razorpay order on backend — send the address along so
-         it can be attached to the order at creation time */
+      //  Create Razorpay order on backend — send the address along so
+      //    it can be attached to the order at creation time 
       const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/v1/payment/create-order`,
         { amount: total, deliveryAddress },
@@ -288,7 +288,7 @@ const CustomerCart = () => {
 
       if (!res.data.success) throw new Error(res.data.message);
 
-      // ✅ FIX: destructure directly from res.data (no nested .data wrapper)
+      //  FIX: destructure directly from res.data (no nested .data wrapper)
       const {
         orderId,
         amount: orderAmount,
@@ -299,16 +299,16 @@ const CustomerCart = () => {
         userPhone,
       } = res.data;
 
-      // ✅ Guard: catch missing key before Razorpay modal opens
+      //  Guard: catch missing key before Razorpay modal opens
       if (!keyId) {
         toast.error("Payment configuration error. Please contact support.");
         setPaymentLoading(false);
         return;
       }
 
-      /* 3. Open Razorpay modal */
+      //  Open Razorpay modal 
       const options = {
-        key: keyId, // ✅ comes from backend, not .env
+        key: keyId, //  comes from backend, not .env
         amount: orderAmount, // already in paise from backend
         currency,
         name: "QuickBite",
@@ -316,8 +316,8 @@ const CustomerCart = () => {
         order_id: orderId,
 
         handler: async (response) => {
-          /* 4. Verify payment signature on backend — send the address again
-             in case the order document is actually created at this step */
+          //  Verify payment signature on backend — send the address again
+          //    in case the order document is actually created at this step 
           try {
             const verifyRes = await axios.post(
               `${import.meta.env.VITE_API_BASE_URL}/api/v1/payment/verify`,

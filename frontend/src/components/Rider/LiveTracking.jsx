@@ -12,7 +12,7 @@ const authHeaders = () => ({
   headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
 });
 
-/* Great-circle distance between two lat/lng points, in meters. */
+// Great-circle distance between two lat/lng points, in meters. 
 const distanceMeters = (a, b) => {
   if (!a || !b) return null;
   const R = 6371000;
@@ -33,8 +33,8 @@ const formatDistance = (meters) => {
   return `${(meters / 1000).toFixed(meters < 10000 ? 1 : 0)} km`;
 };
 
-/* Reticle framing — the recurring signature element for this screen.
-   Four corner brackets around a panel, echoing a targeting / tracking HUD. */
+//  Reticle framing — the recurring signature element for this screen.
+//    Four corner brackets around a panel, echoing a targeting / tracking HUD. */
 const Brackets = ({ className = "", color = "border-amber-400/70" }) => (
   <>
     <span className={`pointer-events-none absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 rounded-tl-md ${color} ${className}`} />
@@ -58,7 +58,7 @@ const LiveTracking = () => {
   const watchIdRef = useRef(null);
   const lastPersistRef = useRef(0);
 
-  /* Load the order so we can plot the restaurant + customer pins. */
+  //  Load the order so we can plot the restaurant + customer pins. */
   useEffect(() => {
     const load = async () => {
       try {
@@ -80,7 +80,7 @@ const LiveTracking = () => {
     load();
   }, [orderId]);
 
-  /* Stream device GPS. */
+  //  Stream device GPS. 
   useEffect(() => {
     if (!("geolocation" in navigator)) {
       setError("Geolocation isn't available on this device");

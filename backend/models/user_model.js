@@ -113,11 +113,7 @@ const userSchema = new mongoose.Schema(
     latitude: { type: Number, default: null },
     longitude: { type: Number, default: null },
 
-    // ---------- Rider-specific fields ----------
-    // (fast-changing operational data like currentLocation/isAvailable
-    // lives in the separate Rider collection — see models/rider_model.js —
-    // this field just lets us tell riders apart quickly wherever a User
-    // is populated, e.g. order.rider)
+
     vehicleType: {
       type: String,
       enum: ["bike", "scooter", "bicycle", "car"],

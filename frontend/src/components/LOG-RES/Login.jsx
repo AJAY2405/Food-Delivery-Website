@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getData } from "@/context/userContext";
 import { Eye, EyeOff, Loader2, Mail, Lock, UtensilsCrossed } from "lucide-react";
+import api from "@/utils/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -45,15 +46,20 @@ const Login = () => {
     try {
       setIsLoading(true);
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/v1/user/login`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
+      // const res = await axios.post(
+      //   `${import.meta.env.VITE_API_BASE_URL}/api/v1/user/login`,
+      //   formData,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     withCredentials: true,
+      //   }
+      // );
+
+      const res = await api.post(
+        "/api/v1/user/login", //  no more full URL, no more manual headers/withCredentials
+        formData
       );
 
       if (res.data.success) {

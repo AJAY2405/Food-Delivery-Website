@@ -59,9 +59,9 @@ export const addFood = async (req, res) => {
   }
 };
 
-/**
- * Edit an existing food item (restaurant only, must own the item)
- */
+
+  // Edit an existing food item (restaurant only, must own the item)
+
 export const editFood = async (req, res) => {
   try {
     const restaurantId = req.userId;
@@ -115,9 +115,9 @@ export const editFood = async (req, res) => {
   }
 };
 
-/**
- * Delete a food item (restaurant only, must own the item)
- */
+
+  // Delete a food item (restaurant only, must own the item)
+
 export const deleteFood = async (req, res) => {
   try {
     const restaurantId = req.userId;
@@ -152,9 +152,9 @@ export const deleteFood = async (req, res) => {
   }
 };
 
-/**
- * Toggle / set availability of a food item quickly (restaurant only)
- */
+
+//  Toggle / set availability of a food item quickly (restaurant only)
+
 export const toggleFoodAvailability = async (req, res) => {
   try {
     const restaurantId = req.userId;
@@ -193,9 +193,9 @@ export const toggleFoodAvailability = async (req, res) => {
   }
 };
 
-/**
- * Get all food items for the logged-in restaurant (restaurant's own menu management)
- */
+
+  // Get all food items for the logged-in restaurant (restaurant's own menu management)
+
 export const getMyFoodItems = async (req, res) => {
   try {
     const restaurantId = req.userId;
@@ -215,9 +215,9 @@ export const getMyFoodItems = async (req, res) => {
   }
 };
 
-/*
- Get all food items for ONE restaurant (public, customer-facing)
- */
+
+//  Get all food items for ONE restaurant (public, customer-facing)
+
 export const getFoodsByRestaurant = async (req, res) => {
   try {
     const { restaurantId } = req.params;
@@ -241,11 +241,7 @@ export const getAllFoodsGroupedByRestaurant = async (req, res) => {
   try {
     const restaurants = await User.find({ role: "restaurant" })
       .select(
-        // ── FIX: address/latitude/longitude were never selected here,
-        // so CustomerBrowse's distance sort/filter always fell back to
-        // the unreliable Nominatim address-geocoding path (or found
-        // nothing at all). These three fields are what the frontend's
-        // haversine distance calc actually needs. ──
+       
         "username restaurantName photoUrl avatar cuisine isOpen openingTime closingTime address latitude longitude"
       )
       .sort({ restaurantName: 1 })
@@ -280,10 +276,10 @@ export const getAllFoodsGroupedByRestaurant = async (req, res) => {
 
 
 
-/**
- * Get ALL food items across all restaurants
- * (used on Home Page / Explore Foods)
- */
+
+  // Get ALL food items across all restaurants
+  // (used on Home Page / Explore Foods)
+ 
 export const getAllFoods = async (req, res) => {
   try {
     const foods = await Food.find()
@@ -311,9 +307,9 @@ export const getAllFoods = async (req, res) => {
 
 // ── Add these two exports to foodController.js ──
 
-/**
- * Get a single food item by id (public, customer-facing detail page)
- */
+
+  // Get a single food item by id (public, customer-facing detail page)
+
 export const getFoodById = async (req, res) => {
   try {
     const { foodId } = req.params;

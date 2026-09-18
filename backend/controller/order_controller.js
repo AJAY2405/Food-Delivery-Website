@@ -111,14 +111,9 @@ export const rejectOrder = async (req, res) => {
   }
 };
 
-/*
-  Restaurant-controlled statuses only go up to "ready_for_pickup".
-  From there, a rider claims the order (via riderController.pickOrder),
-  which is what actually flips it to "out_for_delivery" — and only the
-  assigned rider can later mark it "delivered". This keeps a single
-  writer for each transition instead of both the restaurant and the
-  rider racing to update the same field.
-*/
+
+
+
 export const updateOrderStatus = async (req, res) => {
   try {
     const restaurantId = req.userId;
@@ -189,6 +184,8 @@ export const updateOrderStatus = async (req, res) => {
     });
   }
 };
+
+
 
 export const getCustomerOrders = async (req, res) => {
   try {
