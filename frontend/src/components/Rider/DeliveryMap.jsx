@@ -115,9 +115,14 @@ const DeliveryMap = ({ rider, restaurant, customer, height = "20rem", className 
         className="w-full h-full"
       >
         {/* <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" /> */}
-       <TileLayer
+       {/* <TileLayer
   attribution='&copy; OpenStreetMap contributors'
   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+/> */}
+
+<TileLayer
+  attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+  url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${import.meta.env.VITE_CARTO_KEY}`}
 />
 
 
