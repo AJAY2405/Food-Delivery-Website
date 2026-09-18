@@ -185,7 +185,7 @@ const StatusStepper = ({ status }) => {
   );
 };
 
-/* ── Single order card ── */
+//  Single order card 
 const OrderCard = ({ order, onCancel, cancelling }) => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
