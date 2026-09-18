@@ -114,7 +114,12 @@ const DeliveryMap = ({ rider, restaurant, customer, height = "20rem", className 
         attributionControl={false}
         className="w-full h-full"
       >
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+        {/* <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" /> */}
+       <TileLayer
+  attribution='&copy; OpenStreetMap contributors'
+  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+/>
+
 
         {route && (
           <Polyline
